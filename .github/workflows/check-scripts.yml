@@ -1,0 +1,32 @@
+name: Check Support Scripts
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    paths:
+      - ./.devcontainer/**
+    branches:
+      - main
+
+jobs:
+  shellcheck-helper-scripts:
+    name: Run ShellCheck on helper scripts
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        devcontainer-name: ["default"]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Make devcontainer '${{ matrix.devcontainer-name }}' singular
+      run: .devcontainer/devcontainer-helper --make-singular ${{ matrix.devcontainer-name }}
+    - name: Shellcheck scripts in devcontainer
+      uses: devcontainers/ci@v0.3
+      with:
+        push: never
+        runCmd: |
+          shellcheck --version
+          shellcheck .devcontainer/{cmake,devcontainer}-helper
