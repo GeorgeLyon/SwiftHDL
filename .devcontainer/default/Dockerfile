@@ -53,7 +53,10 @@ RUN \
       clangd-$CLANG_VERSION \
       lld-$CLANG_VERSION \
       lldb-$CLANG_VERSION \
+      #
+      # The following packages are needed by support scripts
       jq \
+      rsync \
       #
       # ShellCheck is useful for validating bash scripts
       shellcheck \
