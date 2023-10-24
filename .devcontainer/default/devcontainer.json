@@ -33,10 +33,11 @@
       "settings": {
         // This must be set in devcontainer.json because they must be absolute paths and thus cannot use `${workspaceFolder}` if defined in `settings.json`
         "mlir.server_path": "${containerWorkspaceFolder}/build/${containerWorkspaceFolderBasename}/bin/circt-lsp-server",
-        "swift.sourcekit-lsp.serverArguments": [
-          "--compilation-db-search-path",
-          "build/${containerWorkspaceFolderBasename}"
-        ]
+        // Reenable this when https://github.com/apple/sourcekit-lsp/commit/645b5110e9e28524c3c699daaad1049c9765895c lands in a release
+        // "swift.sourcekit-lsp.serverArguments": [
+        //   "--compilation-db-search-path",
+        //   "build/${containerWorkspaceFolderBasename}"
+        // ]
       }
     }
   }

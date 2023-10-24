@@ -151,13 +151,3 @@ RUN \
   git clone https://gitlab.kitware.com/etcwilde/cmake -b ewilde/swiftly-remodelling /cmake && \
   cd /cmake && \
   ./bootstrap -- -DCMAKE_USE_OPENSSL=OFF && make &&  make install
-#
-# Install sourcekit-lsp
-RUN \
-  git clone https://github.com/apple/sourcekit-lsp /sourcekit-lsp && \
-  cd /sourcekit-lsp && \
-  export PATH=/swift/usr/bin:${PATH} && \
-  swift package update && \
-  swift build -Xcxx -I/swift/usr/lib/swift -Xcxx -I/swift/usr/lib/swift/Block
-ENV \
-  PATH=/sourcekit-lsp/.build/debug:${PATH}

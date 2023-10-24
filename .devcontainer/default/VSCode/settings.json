@@ -37,7 +37,6 @@
   ],
 
   // -- Swift
-  "swift.sourcekit-lsp.serverPath": "/sourcekit-lsp/.build/debug/sourcekit-lsp",
   "lldb.library": "/swift/usr/lib/liblldb.so",
   "lldb.launch.expressions": "native",
 
