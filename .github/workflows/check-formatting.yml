@@ -26,6 +26,7 @@ jobs:
           # Temporarily 16 since 17 is not yet available
           clang-format-version: 16
           check-path: .
+          exclude-regex: '(mlir|build)'
           fallback-style: llvm
       # Run clang-format in the devcontainer to ensure it is consistent and document the canonical command to run formatting locally.
       - name: Make devcontainer '${{ matrix.devcontainer-name }}' singular
@@ -35,7 +36,7 @@ jobs:
         with:
           push: never
           runCmd: |
-            find test \( -iname "*.h" -o -iname "*.cpp" \) -exec clang-format -i {} \;
+            find lib test include tools \( -iname "*.h" -o -iname "*.cpp" \) -exec clang-format -i {} \;
       - name: Check that no diff was created
         run: |
           .devcontainer/devcontainer-helper --clean

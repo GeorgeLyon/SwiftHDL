@@ -6,6 +6,7 @@ on:
   push:
     paths:
       - ./.devcontainer/**
+      - ./mlir/support
     branches:
       - main
 
@@ -30,3 +31,4 @@ jobs:
         runCmd: |
           shellcheck --version
           shellcheck .devcontainer/{cmake,devcontainer}-helper
+          shellcheck mlir/support/circt-helper

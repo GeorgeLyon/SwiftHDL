@@ -38,8 +38,8 @@ jobs:
           runCmd: |
             git config --global --add safe.directory $PWD
             rm -f .temporary-github-output
-            echo "llvm-hash=${{ hashFiles('/llvm') }}" >> .temporary-github-output
-            echo "circt-hash=${{ hashFiles('/circt') }}" >> .temporary-github-output
+            echo "llvm-hash=${{ hashFiles('mlir/llvm') }}" >> .temporary-github-output
+            echo "circt-hash=${{ hashFiles('mlir/circt') }}" >> .temporary-github-output
             . /etc/lsb-release
             echo "cache-key-prefix=\"ccache-${{ matrix.devcontainer-name }}-${DISTRIB_ID}_${DISTRIB_RELEASE}"
       - name: Export cache key parts
@@ -53,10 +53,10 @@ jobs:
         uses: actions/cache/restore@v3
         with: 
           path: ccache
-          key: ${{ steps.cache-key-parts.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}
+          key: ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}
           restore-keys: |
-            ${{ steps.cache-key-parts.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_
-            ${{ steps.cache-key-parts.cache-key-prefix }}-llvm_
+            ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_
+            ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_
       
       - name: Initialize ccache
         uses: devcontainers/ci@v0.3
@@ -94,7 +94,7 @@ jobs:
       - name: Log build errors
         # https://docs.github.com/en/actions/learn-github-actions/expressions#example-of-failure-with-conditions
         # https://github.com/actions/runner/blob/main/docs/adrs/0274-step-outcome-and-conclusion.md
-        if: ${{ failure() && steps.build-cmake-targets.outcome == 'failure' }}
+        if: ${{ failure() && steps.build-cmake-project.outcome == 'failure' }}
         uses: devcontainers/ci@v0.3
         with:
           push: never
@@ -126,10 +126,10 @@ jobs:
       # Save the cache prior to pruning it. We save the cache as long as the "configure" step was successful, since meaningful work may have been done even if subsequent steps failed.
       - name: Save ccache database
         uses: actions/cache/save@v3
-        if: ${{ always() && steps.configure-cmake-targets.outcome == 'success' }}
+        if: ${{ always() && steps.configure-cmake-project.outcome == 'success' }}
         with: 
           path: ccache
-          key: ${{ steps.cache-key-parts.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}
+          key: ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}
 
       # If evicting everything that wasn't used this workflow does not reduce the cache past its maximum, it may benefit performance to increase the cache size.
       - name: Log ccache estimated usage

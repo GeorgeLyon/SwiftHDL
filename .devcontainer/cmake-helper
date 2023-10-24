@@ -7,7 +7,6 @@ set -euo pipefail
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PROJECT_ROOT=$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)
 
-LLVM_DIR=${LLVM_DIR:-${PROJECT_ROOT}/llvm/llvm}
 CMAKE_HELPER_BUILD_DIR=${CMAKE_HELPER_BUILD_DIR:-$PROJECT_ROOT/build/$(basename "$PROJECT_ROOT")}
 
 case "$1" in
@@ -30,7 +29,7 @@ case "$1" in
     echo "-DCMAKE_BUILD_TYPE=Debug"
     sed 's@//.*@@' < "$VSCODE_SETTINGS_FILE" | \
       sed "s@\${[A-Za-z]*orkspaceFolder}@$PROJECT_ROOT@" | \
-      jq -jr '"\"\(.["cmake.configureArgs"] | join("\" \""))\" -G \(.["cmake.generator"]) "'
+      jq -jr '"-S \"\(.["cmake.sourceDirectory"])\" \"\(.["cmake.configureArgs"] | join("\" \""))\" -G \(.["cmake.generator"]) "'
     echo "$@"
 
     ;;
@@ -38,7 +37,6 @@ case "$1" in
     shift 1 # Remove "configure" from the arguments
 
     "${BASH_SOURCE[0]}" print-configure-args | xargs cmake \
-      "-S$LLVM_DIR" \
       "-B$CMAKE_HELPER_BUILD_DIR"
     rm -f "$PROJECT_ROOT/build/compile_commands.json"
     ln -s "$CMAKE_HELPER_BUILD_DIR/compile_commands.json" "$PROJECT_ROOT/build/compile_commands.json"
