@@ -98,22 +98,17 @@ RUN \
     case $TARGETARCH in \
       "amd64") \
         export SWIFT_ARCH_SUFFIX="" \
-        # export SWIFT_URL=https://download.swift.org/swift-5.9-release/ubuntu2204/swift-5.9-RELEASE/swift-5.9-RELEASE-ubuntu22.04.tar.gz \
-        # https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2023-10-22-a/swift-DEVELOPMENT-SNAPSHOT-2023-10-22-a-ubuntu22.04.tar.gz
         ;; \
       "arm64") \
         export SWIFT_ARCH_SUFFIX="-aarch64" \
-        # export SWIFT_URL=https://download.swift.org/swift-5.9-release/ubuntu2204-aarch64/swift-5.9-RELEASE/swift-5.9-RELEASE-ubuntu22.04-aarch64.tar.gz \
-        # export SWIFT_URL https://download.swift.org/development/ubuntu2204-aarch64/swift-DEVELOPMENT-SNAPSHOT-2023-10-22-a/swift-DEVELOPMENT-SNAPSHOT-2023-10-22-a-ubuntu22.04-aarch64.tar.gz
         ;; \
       *) \
         echo "Unsupported TARGETARCH: $TARGETARCH" && \
         exit 1 \
         ;; \
     esac && \
-    export SWIFT_TAG="swift-DEVELOPMENT-SNAPSHOT-2023-10-21-a"; \
     mkdir /swift && \
-    curl -sL "https://download.swift.org/development/ubuntu2204${SWIFT_ARCH_SUFFIX}/${SWIFT_TAG}/${SWIFT_TAG}-ubuntu22.04${SWIFT_ARCH_SUFFIX}.tar.gz" | tar xz --strip-components=1 -C /swift && \
+    curl -sL "https://download.swift.org/swift-5.9.1-release/ubuntu2204${SWIFT_ARCH_SUFFIX}/swift-5.9.1-RELEASE/swift-5.9.1-RELEASE-ubuntu22.04${SWIFT_ARCH_SUFFIX}.tar.gz" | tar xz --strip-components=1 -C /swift && \
     #
     # Link interesting Swift binaries to /usr/bin (don't link everything since Swift ships with an old version of clang and friends)
     ln -s /swift/usr/bin/swift /usr/bin/swift && \

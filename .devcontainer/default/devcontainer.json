@@ -1,6 +1,6 @@
 // Reference: https://containers.dev/implementors/json_reference/
 {
-  "name": "CIRCT",
+  "name": "SwiftHDL",
   "dockerFile": "Dockerfile",
 
   // Allow the processes in the container to attach a debugger
