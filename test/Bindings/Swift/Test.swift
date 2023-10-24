@@ -7,4 +7,3 @@ let context = SwiftHDL.ScopedContext.create()
 
 // CHECK: Hello, Swift!
 print("Hello, Swift!")
-

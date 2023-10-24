@@ -154,7 +154,7 @@ RUN \
 #
 # Install sourcekit-lsp
 RUN \
-  git clone https://github.com/GeorgeLyon/sourcekit-lsp -b dev/george/compilation-db-search-paths /sourcekit-lsp && \
+  git clone https://github.com/apple/sourcekit-lsp /sourcekit-lsp && \
   cd /sourcekit-lsp && \
   export PATH=/swift/usr/bin:${PATH} && \
   swift package update && \

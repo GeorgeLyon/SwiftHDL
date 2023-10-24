@@ -1,6 +1,6 @@
 {
   // -- CMake Tools
-  "cmake.sourceDirectory": "${workspaceFolder}/llvm/llvm",
+  "cmake.sourceDirectory": "${workspaceFolder}/mlir/llvm/llvm",
   "cmake.buildDirectory": "${workspaceFolder}/build/${workspaceFolderBasename}",
   "cmake.installPrefix": "/usr/local",
   "cmake.configureOnOpen": false,
@@ -31,7 +31,7 @@
 
     // CIRCT
     "-DLLVM_EXTERNAL_PROJECTS=circt;swifthdl",
-    "-DLLVM_EXTERNAL_CIRCT_SOURCE_DIR=${workspaceFolder}/circt",
+    "-DLLVM_EXTERNAL_CIRCT_SOURCE_DIR=${workspaceFolder}/mlir/circt",
     "-DLLVM_EXTERNAL_SWIFTHDL_SOURCE_DIR=${workspaceFolder}",
     "-DCIRCT_LLHD_SIM_ENABLED=OFF"
   ],
