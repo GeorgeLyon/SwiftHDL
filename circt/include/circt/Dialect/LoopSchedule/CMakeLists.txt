@@ -1,2 +1,0 @@
-add_circt_dialect(LoopSchedule loopschedule)
-add_circt_dialect_doc(LoopSchedule loopschedule)

@@ -17,7 +17,7 @@ void *OpaquePointer::get() const {
 
 void OpaquePointer::releaseUnderlyingResource() {
   assert(rawValue);
-  auto any = static_cast<AnyOpaquePointerRepresentable *>(rawValue);
+  auto *any = static_cast<AnyOpaquePointerRepresentable *>(rawValue);
   using Kind = AnyOpaquePointerRepresentable::Kind;
   switch (any->_kind) {
   case Kind::Context: {

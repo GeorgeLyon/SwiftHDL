@@ -1,2 +1,0 @@
-add_subdirectory(DebugInfo)
-add_subdirectory(ExportSystemC)

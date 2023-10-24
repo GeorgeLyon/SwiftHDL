@@ -1,9 +1,0 @@
-[
-  {
-    "class": "firrtl.annotations.LoadMemoryAnnotation",
-    "target": "Foo.Foo.m",
-    "fileName": "mem2.txt",
-    "hexOrBinary": "b",
-    "originalMemoryNameOpt": "m"
-  }
-]
