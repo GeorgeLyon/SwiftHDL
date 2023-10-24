@@ -11,6 +11,18 @@ on:
       - main
 
 jobs:
+  check-metadata-consistency:
+    name: Check CIRCT metadata consistency
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-13]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check CIRCT consistency
+        run: |
+          ./mlir/support/circt-helper check-metadata-consistency
   shellcheck-helper-scripts:
     name: Run ShellCheck on helper scripts
     runs-on: ubuntu-latest
