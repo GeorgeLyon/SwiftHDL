@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM ubuntu:rolling
+FROM --platform=$BUILDPLATFORM ubuntu:22.04
 
 # The following line is needed to set the $TARGETARCH variable to amd64 or arm64 depending on the target architecture. If you need alternative formulations (x86_64 or aarch64) use $(arch) in a RUN command.
 ARG TARGETARCH
@@ -43,7 +43,7 @@ RUN \
       #
       # The following packages are used to build CIRCT
       ccache \
-      cmake \
+      # cmake \ (Using custom build)
       make \
       ninja-build \
       clang-$CLANG_VERSION \
@@ -54,15 +54,36 @@ RUN \
       lld-$CLANG_VERSION \
       lldb-$CLANG_VERSION \
       #
+      # The following packages are required by Swift
+      binutils \
+      git \
+      gnupg2 \
+      libc6-dev \
+      libcurl4-openssl-dev \
+      libedit2 \
+      libgcc-9-dev \
+      libpython3.8 \
+      libsqlite3-0 \
+      libstdc++-9-dev \
+      libxml2-dev \
+      libz3-dev \
+      pkg-config \
+      tzdata \
+      unzip \
+      zlib1g-dev \
+      #
       # The following packages are needed by support scripts
       jq \
       rsync \
       #
+      # sourcekit-lsp dependencies
+      libsqlite3-dev \
+      libncurses5-dev \
+      python3 \
+      ninja-build \
+      #
       # ShellCheck is useful for validating bash scripts
       shellcheck \
-      #
-      # Verilator is used to run generated verilog
-      verilator \
     && \
     #
     # Remove GCC (installed as a dependency of CMake) and the MSVC version of clang to reduce CMake confusion
@@ -72,6 +93,32 @@ RUN \
     #
     # Create suffix-free links to clang binaries
     for FILE in $(find /usr/bin -name "*-$CLANG_VERSION"); do ln -s ${FILE} ${FILE%-$CLANG_VERSION}; done && \
+    #
+    # Install Swift
+    case $TARGETARCH in \
+      "amd64") \
+        export SWIFT_ARCH_SUFFIX="" \
+        # export SWIFT_URL=https://download.swift.org/swift-5.9-release/ubuntu2204/swift-5.9-RELEASE/swift-5.9-RELEASE-ubuntu22.04.tar.gz \
+        # https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2023-10-22-a/swift-DEVELOPMENT-SNAPSHOT-2023-10-22-a-ubuntu22.04.tar.gz
+        ;; \
+      "arm64") \
+        export SWIFT_ARCH_SUFFIX="-aarch64" \
+        # export SWIFT_URL=https://download.swift.org/swift-5.9-release/ubuntu2204-aarch64/swift-5.9-RELEASE/swift-5.9-RELEASE-ubuntu22.04-aarch64.tar.gz \
+        # export SWIFT_URL https://download.swift.org/development/ubuntu2204-aarch64/swift-DEVELOPMENT-SNAPSHOT-2023-10-22-a/swift-DEVELOPMENT-SNAPSHOT-2023-10-22-a-ubuntu22.04-aarch64.tar.gz
+        ;; \
+      *) \
+        echo "Unsupported TARGETARCH: $TARGETARCH" && \
+        exit 1 \
+        ;; \
+    esac && \
+    export SWIFT_TAG="swift-DEVELOPMENT-SNAPSHOT-2023-10-21-a"; \
+    mkdir /swift && \
+    curl -sL "https://download.swift.org/development/ubuntu2204${SWIFT_ARCH_SUFFIX}/${SWIFT_TAG}/${SWIFT_TAG}-ubuntu22.04${SWIFT_ARCH_SUFFIX}.tar.gz" | tar xz --strip-components=1 -C /swift && \
+    #
+    # Link interesting Swift binaries to /usr/bin (don't link everything since Swift ships with an old version of clang and friends)
+    ln -s /swift/usr/bin/swift /usr/bin/swift && \
+    ln -s /swift/usr/bin/swiftc /usr/bin/swiftc && \
+    ln -s /swift/usr/bin/sourcekit-lsp /usr/bin/sourcekit-lsp && \
     #
     # Verilator hardcodes "g++" as the C++ compiler, so we symlink clang++ to g++ to avoid having gcc installed
     cd /usr/bin && ln -s clang++-$CLANG_VERSION g++ && \
@@ -97,3 +144,20 @@ RUN \
         exit 1 \
         ;; \
     esac
+
+#
+# Install CMake
+RUN \
+  git clone https://gitlab.kitware.com/etcwilde/cmake -b ewilde/swiftly-remodelling /cmake && \
+  cd /cmake && \
+  ./bootstrap -- -DCMAKE_USE_OPENSSL=OFF && make &&  make install
+#
+# Install sourcekit-lsp
+RUN \
+  git clone https://github.com/GeorgeLyon/sourcekit-lsp -b dev/george/compilation-db-search-paths /sourcekit-lsp && \
+  cd /sourcekit-lsp && \
+  export PATH=/swift/usr/bin:${PATH} && \
+  swift package update && \
+  swift build -Xcxx -I/swift/usr/lib/swift -Xcxx -I/swift/usr/lib/swift/Block
+ENV \
+  PATH=/sourcekit-lsp/.build/debug:${PATH}

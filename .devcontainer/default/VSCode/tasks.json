@@ -7,6 +7,8 @@
       "command": "build",
       "targets": [
         "circt-lsp-server",
+        "swift-hdl-bindings-support-test",
+        "SwiftHDL_Bindings_Swift_Test",
         "firtool"
       ],
       "group": {
@@ -20,7 +22,8 @@
       "label": "Test CIRCT",
       "command": "build",
       "targets": [
-        "check-circt"
+        "check-circt",
+        "check-swift-hdl"
       ],
       "group": {
         "kind": "test",

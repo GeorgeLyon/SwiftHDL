@@ -35,7 +35,7 @@ jobs:
         with:
           push: never
           runCmd: |
-            find circel \( -iname "*.h" -o -iname "*.cpp" \) -exec clang-format -i {} \;
+            find test \( -iname "*.h" -o -iname "*.cpp" \) -exec clang-format -i {} \;
       - name: Check that no diff was created
         run: |
           .devcontainer/devcontainer-helper --clean

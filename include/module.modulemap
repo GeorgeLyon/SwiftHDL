@@ -1,0 +1,6 @@
+module SwiftHDL_Bindings_Support {
+  requires cplusplus
+
+  umbrella "SwiftHDL/Bindings/Support"
+  module * { export * }
+}
