@@ -41,7 +41,7 @@ jobs:
             echo "llvm-hash=${{ hashFiles('mlir/llvm') }}" >> .temporary-github-output
             echo "circt-hash=${{ hashFiles('mlir/circt') }}" >> .temporary-github-output
             . /etc/lsb-release
-            echo "cache-key-prefix=\"ccache-${{ matrix.devcontainer-name }}-${DISTRIB_ID}_${DISTRIB_RELEASE}"
+            echo "cache-key-prefix=\"ccache-${{ matrix.devcontainer-name }}-${DISTRIB_ID}_${DISTRIB_RELEASE}" >> .temporary-github-output
       - name: Export cache key parts
         id: cache-key-parts
         run: |
