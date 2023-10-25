@@ -1,1 +1,1 @@
-# No tools yet
+add_subdirectory(swift-hdl-lsp-server)
