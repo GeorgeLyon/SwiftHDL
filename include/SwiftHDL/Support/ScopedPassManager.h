@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SwiftHDL/Bindings/Support/OpaquePointer.h"
-#include "SwiftHDL/Bindings/Support/ReferenceCountedPointer.h"
+#include "SwiftHDL/Support/OpaquePointer.h"
+#include "SwiftHDL/Support/ReferenceCountedPointer.h"
 
 namespace mlir {
 struct LogicalResult;

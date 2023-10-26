@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SwiftHDL/Bindings/Support/ReferenceCountedPointer.h"
+#include "SwiftHDL/Support/ReferenceCountedPointer.h"
 
 #include <atomic>
 #include <cassert>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SwiftHDL/Bindings/Support/OpaquePointer.h"
-#include "SwiftHDL/Bindings/Support/ReferenceCountedPointer.h"
+#include "SwiftHDL/Support/OpaquePointer.h"
+#include "SwiftHDL/Support/ReferenceCountedPointer.h"
 
 #include <llvm/Support/Casting.h>
 #include <mlir/IR/Attributes.h>
@@ -27,7 +27,7 @@ public:
 
   // -- Accessors
   operator mlir::MLIRContext *() const;
-  mlir::MLIRContext *getContext() { return *this; }
+  mlir::MLIRContext *getContext() const { return *this; }
 
   // -- User Data
   /**

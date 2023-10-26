@@ -1,9 +1,9 @@
 // RUN: swift-hdl-bindings-support-test 2>&1 | FileCheck %s
 
-#include "SwiftHDL/Bindings/Support/OpaquePointer.h"
-#include "SwiftHDL/Bindings/Support/ScopedBuilder.h"
-#include "SwiftHDL/Bindings/Support/ScopedContext.h"
-#include "SwiftHDL/Bindings/Support/ScopedPassManager.h"
+#include "SwiftHDL/Support/OpaquePointer.h"
+#include "SwiftHDL/Support/ScopedBuilder.h"
+#include "SwiftHDL/Support/ScopedContext.h"
+#include "SwiftHDL/Support/ScopedPassManager.h"
 
 #include <llvm/Support/raw_ostream.h>
 #include <mlir/IR/Builders.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SwiftHDL/Bindings/Support/ScopedContext.h"
+#include "SwiftHDL/Support/ScopedContext.h"
 
 #include "OpaquePointer.h"
 #include "ReferenceCountedPointer.h"

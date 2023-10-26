@@ -1,11 +1,10 @@
 // RUN: SwiftHDL_Bindings_Swift_Test 2>&1 | FileCheck %s
 
 import CxxStdlib
-import SwiftHDL_Bindings_Support
+import SwiftHDL
 
-var context = SwiftHDL.ScopedContext.create()
-
-let x = context.__getContextUnsafe();
+let context = SwiftHDL.ScopedContext.create()
+circt.firrtl.loadFIRRTLDialect(context.__getContextUnsafe());
 
 // CHECK: Hello, Swift!
 print("Hello, Swift!")

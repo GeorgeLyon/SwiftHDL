@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SwiftHDL/Bindings/Support/OpaquePointer.h"
-#include "SwiftHDL/Bindings/Support/ReferenceCountedPointer.h"
-#include "SwiftHDL/Bindings/Support/ScopedContext.h"
+#include "SwiftHDL/Support/OpaquePointer.h"
+#include "SwiftHDL/Support/ReferenceCountedPointer.h"
+#include "SwiftHDL/Support/ScopedContext.h"
 
 #include <llvm/Support/Casting.h>
 #include <mlir/IR/OpDefinition.h>

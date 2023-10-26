@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SwiftHDL/Bindings/Support/OpaquePointer.h"
+#include "SwiftHDL/Support/OpaquePointer.h"
 #include <cassert>
 
 namespace SwiftHDL {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SwiftHDL/Bindings/Support/ScopedBuilder.h"
-#include "SwiftHDL/Bindings/Support/ScopedPassManager.h"
+#include "SwiftHDL/Support/ScopedBuilder.h"
+#include "SwiftHDL/Support/ScopedPassManager.h"
 
 #include "OpaquePointer.h"
 #include "ReferenceCountedPointer.h"
