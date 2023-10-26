@@ -3,7 +3,9 @@
 import CxxStdlib
 import SwiftHDL_Bindings_Support
 
-let context = SwiftHDL.ScopedContext.create()
+var context = SwiftHDL.ScopedContext.create()
+
+let x = context.__getContextUnsafe();
 
 // CHECK: Hello, Swift!
 print("Hello, Swift!")

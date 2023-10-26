@@ -1,5 +1,4 @@
-#ifndef SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_PASS_MANAGER_INTERNAL_H_
-#define SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_PASS_MANAGER_INTERNAL_H_
+#pragma once
 
 #include "SwiftHDL/Bindings/Support/ScopedBuilder.h"
 #include "SwiftHDL/Bindings/Support/ScopedPassManager.h"
@@ -37,5 +36,3 @@ struct ScopedPassManager::Implementation
 };
 
 } // namespace SwiftHDL
-
-#endif // SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_PASS_MANAGER_INTERNAL_H_

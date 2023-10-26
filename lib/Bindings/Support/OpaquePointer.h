@@ -1,5 +1,4 @@
-#ifndef SWIFT_HDL_BINDINGS_SUPPORT_OPAQUE_POINTER_INTERNAL_H_
-#define SWIFT_HDL_BINDINGS_SUPPORT_OPAQUE_POINTER_INTERNAL_H_
+#pragma once
 
 #include "SwiftHDL/Bindings/Support/OpaquePointer.h"
 #include <cassert>
@@ -55,5 +54,3 @@ public:
 };
 
 } // namespace SwiftHDL
-
-#endif // SWIFT_HDL_BINDINGS_SUPPORT_OPAQUE_POINTER_INTERNAL_H_

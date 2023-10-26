@@ -1,5 +1,4 @@
-#ifndef SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_PASS_MANAGER_H_
-#define SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_PASS_MANAGER_H_
+#pragma once
 
 #include "SwiftHDL/Bindings/Support/OpaquePointer.h"
 #include "SwiftHDL/Bindings/Support/ReferenceCountedPointer.h"
@@ -48,5 +47,3 @@ private:
 };
 
 } // namespace SwiftHDL
-
-#endif // SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_PASS_MANAGER_H_

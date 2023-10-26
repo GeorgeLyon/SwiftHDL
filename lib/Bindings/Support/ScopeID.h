@@ -1,5 +1,4 @@
-#ifndef SWIFT_HDL_BINDINGS_SUPPORT_SCOPE_ID_H_
-#define SWIFT_HDL_BINDINGS_SUPPORT_SCOPE_ID_H_
+#pragma once
 
 #include <cassert>
 #include <mutex>
@@ -41,5 +40,3 @@ public:
 
 } // namespace detail
 } // namespace SwiftHDL
-
-#endif // SWIFT_HDL_BINDINGS_SUPPORT_SCOPE_ID_H_

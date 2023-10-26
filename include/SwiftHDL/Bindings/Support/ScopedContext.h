@@ -1,5 +1,4 @@
-#ifndef SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_CONTEXT_H_
-#define SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_CONTEXT_H_
+#pragma once
 
 #include "SwiftHDL/Bindings/Support/OpaquePointer.h"
 #include "SwiftHDL/Bindings/Support/ReferenceCountedPointer.h"
@@ -28,6 +27,7 @@ public:
 
   // -- Accessors
   operator mlir::MLIRContext *() const;
+  mlir::MLIRContext *getContext() { return *this; }
 
   // -- User Data
   /**
@@ -90,5 +90,3 @@ private:
 };
 
 } // namespace SwiftHDL
-
-#endif // SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_CONTEXT_H_

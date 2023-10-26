@@ -1,5 +1,4 @@
-#ifndef SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_BUILDER_INTERNAL_H_
-#define SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_BUILDER_INTERNAL_H_
+#pragma once
 
 #include "SwiftHDL/Bindings/Support/ScopedBuilder.h"
 #include "SwiftHDL/Bindings/Support/ScopedContext.h"
@@ -84,5 +83,3 @@ struct ScopedBuilder::Implementation
 };
 
 } // namespace SwiftHDL
-
-#endif // SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_BUILDER_INTERNAL_H_

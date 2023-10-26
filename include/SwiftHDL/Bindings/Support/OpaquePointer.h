@@ -1,5 +1,4 @@
-#ifndef SWIFT_HDL_BINDINGS_SUPPORT_OPAQUE_POINTER_H_
-#define SWIFT_HDL_BINDINGS_SUPPORT_OPAQUE_POINTER_H_
+#pragma once
 
 namespace SwiftHDL {
 
@@ -15,5 +14,3 @@ public:
 };
 
 } // namespace SwiftHDL
-
-#endif // SWIFT_HDL_BINDINGS_SUPPORT_OPAQUE_POINTER

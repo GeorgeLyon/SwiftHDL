@@ -1,5 +1,4 @@
-#ifndef SWIFT_HDL_BINDINGS_SUPPORT_REFERENCE_COUNTED_POINTER_INTERNAL_H_
-#define SWIFT_HDL_BINDINGS_SUPPORT_REFERENCE_COUNTED_POINTER_INTERNAL_H_
+#pragma once
 
 #include "SwiftHDL/Bindings/Support/ReferenceCountedPointer.h"
 
@@ -57,5 +56,3 @@ public:
 };
 
 } // namespace SwiftHDL
-
-#endif // SWIFT_HDL_BINDINGS_SUPPORT_REFERENCE_COUNTED_POINTER_INTERNAL_H_

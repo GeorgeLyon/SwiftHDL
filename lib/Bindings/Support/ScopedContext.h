@@ -1,5 +1,4 @@
-#ifndef SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_CONTEXT_INTERNAL_H_
-#define SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_CONTEXT_INTERNAL_H_
+#pragma once
 
 #include "SwiftHDL/Bindings/Support/ScopedContext.h"
 
@@ -75,5 +74,3 @@ struct ScopedContext::Implementation
 };
 
 } // namespace SwiftHDL
-
-#endif // SWIFT_HDL_BINDINGS_SUPPORT_SCOPED_CONTEXT_INTERNAL_H_
