@@ -7,7 +7,8 @@ set -euo pipefail
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PROJECT_ROOT=$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)
 
-CMAKE_HELPER_BUILD_DIR=${CMAKE_HELPER_BUILD_DIR:-$PROJECT_ROOT/build/$(basename "$PROJECT_ROOT")}
+CMAKE_HELPER_BUILD_ROOT=${CMAKE_HELPER_BUILD_ROOT:-$PROJECT_ROOT/build}
+CMAKE_HELPER_BUILD_DIR=${CMAKE_HELPER_BUILD_DIR:-$CMAKE_HELPER_BUILD_ROOT/$(basename "$PROJECT_ROOT")}
 
 case "$1" in
   "print-configure-args")
@@ -26,10 +27,10 @@ case "$1" in
       exit 1
     fi
     
-    echo "-DCMAKE_BUILD_TYPE=Debug"
     sed 's@//.*@@' < "$VSCODE_SETTINGS_FILE" | \
       sed "s@\${[A-Za-z]*orkspaceFolder}@$PROJECT_ROOT@" | \
-      jq -jr '"-S \"\(.["cmake.sourceDirectory"])\" \"\(.["cmake.configureArgs"] | join("\" \""))\" -G \(.["cmake.generator"]) "'
+      jq -jr '"\"\(.["cmake.configureArgs"] | join("\"\n\""))\"\n-S\(.["cmake.sourceDirectory"])\n-G \(.["cmake.generator"])\n"'
+    echo "\"-DCMAKE_BUILD_TYPE=Debug\""
     echo "$@"
 
     ;;
@@ -37,7 +38,8 @@ case "$1" in
     shift 1 # Remove "configure" from the arguments
 
     "${BASH_SOURCE[0]}" print-configure-args | xargs cmake \
-      "-B$CMAKE_HELPER_BUILD_DIR"
+      "-B$CMAKE_HELPER_BUILD_DIR" \
+      "$@"
     rm -f "$PROJECT_ROOT/build/compile_commands.json"
     ln -s "$CMAKE_HELPER_BUILD_DIR/compile_commands.json" "$PROJECT_ROOT/build/compile_commands.json"
     ;;
@@ -61,7 +63,46 @@ case "$1" in
     set -x
     cmake \
       --build "$CMAKE_HELPER_BUILD_DIR" \
-      --target "${TARGETS[@]}" --
+      --target "${TARGETS[@]}"
+    ;;
+  "install-with-dependencies")
+    shift
+
+    CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX:-$CMAKE_HELPER_BUILD_ROOT/install}
+
+    if [[ $# -ne 1 ]]; then
+      echo "Usage: cmake-helper install-with-dependencies"
+      echo "  Installs the specified target and its dependencies"
+    fi
+    ROOT_TARGET="$1"
+
+    #
+    # GraphViz Options
+    mkdir -p "$CMAKE_HELPER_BUILD_DIR"
+    cat << EOF > "$CMAKE_HELPER_BUILD_DIR/CMakeGraphVizOptions.cmake"
+set(GRAPHVIZ_EXECUTABLES OFF)
+set(GRAPHVIZ_STATIC_LIBS ON)
+set(GRAPHVIZ_SHARED_LIBS OFF)
+set(GRAPHVIZ_MODULE_LIBS ON)
+set(GRAPHVIZ_OBJECT_LIBS OFF)
+set(GRAPHVIZ_GENERATE_DEPENDERS OFF)
+set(GRAPHVIZ_EXTERNAL_LIBS OFF)
+set(GRAPHVIZ_IGNORE_TARGETS "")
+EOF
+
+    #
+    # Export GraphViz
+    GRAPHVIZ_BASE="$CMAKE_HELPER_BUILD_ROOT/graphviz/dot"
+    ./.devcontainer/cmake-helper print-configure-args | xargs cmake \
+      "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}" \
+      -B"$CMAKE_HELPER_BUILD_DIR" \
+      --graphviz="$GRAPHVIZ_BASE"
+
+    sed -n 's@^.* // .* -> \(.*\)@install-\1@p' < "$GRAPHVIZ_BASE.$ROOT_TARGET" | 
+      sort -u |
+      xargs cmake \
+        --build "$CMAKE_HELPER_BUILD_DIR" \
+        --target 
     ;;
   *)
     echo "Usage: $0 [configure|build|test]"
