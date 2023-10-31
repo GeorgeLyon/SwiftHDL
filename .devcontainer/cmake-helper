@@ -21,7 +21,7 @@ case "$1" in
       exit 1;
     fi
 
-    VSCODE_SETTINGS_FILE=${VSCODE_SETTINGS_FILE:-$PROJECT_ROOT/.vscode/settings.json}
+    VSCODE_SETTINGS_FILE=${VSCODE_SETTINGS_FILE:-$PROJECT_ROOT/.devcontainer/default/VSCode/settings.json}
     if ! sed 's@//.*@@' < "$VSCODE_SETTINGS_FILE" | jq . > /dev/null; then
       echo "Error: $VSCODE_SETTINGS_FILE is not a valid JSON file."
       exit 1
@@ -98,11 +98,23 @@ EOF
       -B"$CMAKE_HELPER_BUILD_DIR" \
       --graphviz="$GRAPHVIZ_BASE"
 
-    sed -n 's@^.* // .* -> \(.*\)@install-\1@p' < "$GRAPHVIZ_BASE.$ROOT_TARGET" | 
-      sort -u |
-      xargs cmake \
+    INSTALLED_LIBS_FILE="${CMAKE_INSTALL_PREFIX}/installed-libs.txt"
+
+    # Install Libraries and Headers
+    sed -n 's@^.* // .* -> \(.*\)@\1@p' < "$GRAPHVIZ_BASE.$ROOT_TARGET" |
+      sort -u > "$INSTALLED_LIBS_FILE"
+    xargs cmake \
         --build "$CMAKE_HELPER_BUILD_DIR" \
-        --target 
+        --target install-{llvm,mlir,circt}-headers < "$INSTALLED_LIBS_FILE"
+
+    # Create pkg-config file
+    PKG_CONFIG_DIR="$CMAKE_INSTALL_PREFIX/lib/pkgconfig"
+    mkdir -p "$PKG_CONFIG_DIR"
+    cat << EOF > "$PKG_CONFIG_DIR/${ROOT_TARGET}.pc"
+Name: ${ROOT_TARGET}
+CFlags: -I${CMAKE_INSTALL_PREFIX}/include
+Libs: -L${CMAKE_INSTALL_PREFIX}/lib $(sed 's/^/-l/' < "$INSTALLED_LIBS_FILE" | tr '\n' ' ')
+EOF
     ;;
   *)
     echo "Usage: $0 [configure|build|test]"

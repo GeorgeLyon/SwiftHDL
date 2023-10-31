@@ -1,0 +1,5 @@
+module CIRCTFirtool [system] {
+  requires cplusplus
+  header "CIRCTFirtool.h"
+  export *
+}
