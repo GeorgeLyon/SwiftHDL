@@ -16,14 +16,12 @@ let package = Package(
     .target(
       name: "SwiftHDL",
       dependencies: ["CIRCTFirtool"],
-      cSettings: [
-        .unsafeFlags(["-std=c++17"])
-      ],
       swiftSettings: [
         .interoperabilityMode(.Cxx),
       ]),
     .testTarget(
       name: "SwiftHDLTests",
       dependencies: ["SwiftHDL"]),
-  ]
+  ],
+  cxxLanguageStandard: .cxx17
 )
