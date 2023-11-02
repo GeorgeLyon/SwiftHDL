@@ -101,11 +101,14 @@ EOF
     INSTALLED_LIBS_FILE="${CMAKE_INSTALL_PREFIX}/installed-libs.txt"
 
     # Install Libraries and Headers
+    mkdir -p "${CMAKE_INSTALL_PREFIX}"
+    echo "$ROOT_TARGET" > "$INSTALLED_LIBS_FILE"
     sed -n 's@^.* // .* -> \(.*\)@\1@p' < "$GRAPHVIZ_BASE.$ROOT_TARGET" |
-      sort -u > "$INSTALLED_LIBS_FILE"
-    xargs cmake \
+      sort -u >> "$INSTALLED_LIBS_FILE"
+    set -x
+    sed 's/^/install-/' < "$INSTALLED_LIBS_FILE" | xargs cmake \
         --build "$CMAKE_HELPER_BUILD_DIR" \
-        --target install-{llvm,mlir,circt}-headers < "$INSTALLED_LIBS_FILE"
+        --target 
 
     # Create pkg-config file
     PKG_CONFIG_DIR="$CMAKE_INSTALL_PREFIX/lib/pkgconfig"

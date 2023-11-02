@@ -3,6 +3,6 @@ import XCTest
 
 final class SwiftHDLTests: XCTestCase {
   func testExample() throws {
-    XCTAssertEqual(SwiftHDL().test(), "Hello, George!")
+    XCTAssertEqual(SwiftHDL.test(), "Hello, CIRCT!")
   }
 }

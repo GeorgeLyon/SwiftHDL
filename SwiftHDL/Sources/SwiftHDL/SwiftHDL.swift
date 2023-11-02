@@ -1,8 +1,9 @@
-import CIRCTFirtool
+@_implementationOnly import CIRCTFirtool
 
-enum SwiftHDL {
-  func test() -> String {
+public enum SwiftHDL {
+  public static func test() -> String {
     let context = mlir.MLIRContextCreate();
-    return "Hello, George!"
+    let attribute = mlir.StringAttr.get(context, llvm.Twine("Hello, CIRCT!"))
+    return String(attribute.str())
   }
 }

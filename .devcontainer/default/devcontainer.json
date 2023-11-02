@@ -18,7 +18,8 @@
   ],
   "remoteEnv": {
     "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
-    "PATH": "${containerWorkspaceFolder}/build/${containerWorkspaceFolderBasename}/bin:${containerEnv:PATH}"
+    "PATH": "${containerWorkspaceFolder}/build/${containerWorkspaceFolderBasename}/bin:${containerEnv:PATH}",
+    "PKG_CONFIG_PATH": "${containerWorkspaceFolder}/build/install/lib/pkgconfig"
   },
   "customizations": {
     "vscode": {

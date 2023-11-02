@@ -37,7 +37,8 @@ void testContext() {
     contextPointer = context.toRetainedOpaquePointer();
 
     // CHECK-NEXT: Context Test
-    StringAttr::get(context, "Context Test").dump();
+    auto attr = StringAttr::get(context, "Context Test");
+    attr.dump();
 
     locationPointer = context.wrap(UnknownLoc::get(context));
 

@@ -4,10 +4,16 @@ import PackageDescription
 
 let package = Package(
   name: "SwiftHDL",
+  platforms: [
+    .macOS(.v14)
+  ],
   products: [
     .library(
       name: "SwiftHDL",
+      type: .dynamic,
       targets: ["SwiftHDL"]),
+  ],
+  dependencies: [
   ],
   targets: [
     .systemLibrary(
@@ -21,7 +27,10 @@ let package = Package(
       ]),
     .testTarget(
       name: "SwiftHDLTests",
-      dependencies: ["SwiftHDL"]),
+      dependencies: ["SwiftHDL"],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx),
+      ]),
   ],
   cxxLanguageStandard: .cxx17
 )
