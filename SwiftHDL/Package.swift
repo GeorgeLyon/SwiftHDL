@@ -27,10 +27,7 @@ let package = Package(
       ]),
     .testTarget(
       name: "SwiftHDLTests",
-      dependencies: ["SwiftHDL"],
-      swiftSettings: [
-        .interoperabilityMode(.Cxx),
-      ]),
+      dependencies: ["SwiftHDL"]),
   ],
   cxxLanguageStandard: .cxx17
 )

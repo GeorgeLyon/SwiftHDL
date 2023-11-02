@@ -86,7 +86,7 @@ set(GRAPHVIZ_SHARED_LIBS OFF)
 set(GRAPHVIZ_MODULE_LIBS ON)
 set(GRAPHVIZ_OBJECT_LIBS OFF)
 set(GRAPHVIZ_GENERATE_DEPENDERS OFF)
-set(GRAPHVIZ_EXTERNAL_LIBS OFF)
+set(GRAPHVIZ_EXTERNAL_LIBS ON)
 set(GRAPHVIZ_IGNORE_TARGETS "")
 EOF
 
@@ -97,27 +97,27 @@ EOF
       "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}" \
       -B"$CMAKE_HELPER_BUILD_DIR" \
       --graphviz="$GRAPHVIZ_BASE"
-
-    INSTALLED_LIBS_FILE="${CMAKE_INSTALL_PREFIX}/installed-libs.txt"
-
-    # Install Libraries and Headers
+    
+    # Get transitive dependencies
+    TRANSITIVE_DEPENDENCIES_FILE="${CMAKE_INSTALL_PREFIX}/$ROOT_TARGET-trasitive-dependencies.txt"
     mkdir -p "${CMAKE_INSTALL_PREFIX}"
-    echo "$ROOT_TARGET" > "$INSTALLED_LIBS_FILE"
-    sed -n 's@^.* // .* -> \(.*\)@\1@p' < "$GRAPHVIZ_BASE.$ROOT_TARGET" |
-      sort -u >> "$INSTALLED_LIBS_FILE"
-    set -x
-    sed 's/^/install-/' < "$INSTALLED_LIBS_FILE" | xargs cmake \
-        --build "$CMAKE_HELPER_BUILD_DIR" \
-        --target 
+    "$SCRIPT_DIR/process-cmake-graphviz-graph" < "$GRAPHVIZ_BASE.$ROOT_TARGET" \
+      > "$TRANSITIVE_DEPENDENCIES_FILE"
 
     # Create pkg-config file
-    PKG_CONFIG_DIR="$CMAKE_INSTALL_PREFIX/lib/pkgconfig"
+    PKG_CONFIG_DIR="$CMAKE_INSTALL_PREFIX/pkgconfig"
     mkdir -p "$PKG_CONFIG_DIR"
     cat << EOF > "$PKG_CONFIG_DIR/${ROOT_TARGET}.pc"
 Name: ${ROOT_TARGET}
 CFlags: -I${CMAKE_INSTALL_PREFIX}/include
-Libs: -L${CMAKE_INSTALL_PREFIX}/lib $(sed 's/^/-l/' < "$INSTALLED_LIBS_FILE" | tr '\n' ' ')
+Libs: -L${CMAKE_INSTALL_PREFIX}/lib $(sed -E 's/^(internal|external): /-l/' < "$TRANSITIVE_DEPENDENCIES_FILE" | tr '\n' ' ')
 EOF
+
+    # Install internal libraries and headers
+    sed -n 's/^internal: \(.*\)/install-\1/p' < "$TRANSITIVE_DEPENDENCIES_FILE" | xargs cmake \
+        --build "$CMAKE_HELPER_BUILD_DIR" \
+        --target install-{llvm,mlir,circt}-headers
+
     ;;
   *)
     echo "Usage: $0 [configure|build|test]"
