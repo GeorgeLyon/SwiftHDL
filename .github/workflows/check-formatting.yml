@@ -1,0 +1,43 @@
+name: Check Formatting
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  formatting-cpp:
+    name: Check C++ Formatting
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        devcontainer-name: ["default"]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Fail fast by running clang-format natively
+      - name: Format C++ code
+        uses: jidicula/clang-format-action@v4.11.0
+        with:
+          # Temporarily 16 since 17 is not yet available
+          clang-format-version: 16
+          check-path: mlir/swift-hdl
+          fallback-style: llvm
+      # Run clang-format in the devcontainer to ensure it is consistent and document the canonical command to run formatting locally.
+      - name: Make devcontainer '${{ matrix.devcontainer-name }}' singular
+        run: .devcontainer/devcontainer-helper --make-singular ${{ matrix.devcontainer-name }}
+      - name: Format C++ code in devcontainer
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            find mlir/swift-hdl \( -iname "*.h" -o -iname "*.cpp" \) -exec clang-format -i {} \;
+      - name: Check that no diff was created
+        run: |
+          .devcontainer/devcontainer-helper --clean
+          git diff
+          git diff --exit-code

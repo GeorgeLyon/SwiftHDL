@@ -8,6 +8,7 @@
       "targets": [
         "firtool",
         "SwiftHDLPlaceholder",
+        "SwiftHDL_Swift_Test",
         "swift-hdl-lsp-server"
       ],
       "group": {

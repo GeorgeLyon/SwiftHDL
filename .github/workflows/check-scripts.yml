@@ -1,0 +1,46 @@
+name: Check Support Scripts
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    paths:
+      - ./.devcontainer/**
+      - ./mlir/support
+    branches:
+      - main
+
+jobs:
+  check-metadata-consistency:
+    name: Check CIRCT metadata consistency
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-13]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check CIRCT consistency
+        run: |
+          ./mlir/support/circt-helper check-metadata-consistency
+  shellcheck-helper-scripts:
+    name: Run ShellCheck on helper scripts
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        devcontainer-name: ["default"]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Make devcontainer '${{ matrix.devcontainer-name }}' singular
+      run: .devcontainer/devcontainer-helper --make-singular ${{ matrix.devcontainer-name }}
+    - name: Shellcheck scripts in devcontainer
+      uses: devcontainers/ci@v0.3
+      with:
+        push: never
+        runCmd: |
+          shellcheck --version
+          shellcheck .devcontainer/{cmake-tools,devcontainer}-helper
+          shellcheck support/{circt-helper,install-target-and-dependencies}
