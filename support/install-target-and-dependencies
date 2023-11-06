@@ -58,5 +58,5 @@ EOF
 
 # Install internal libraries and headers
 sed -n 's/^internal: \(.*\)/install-\1/p' < "$TRANSITIVE_DEPENDENCIES_FILE" | xargs cmake \
-    --build "$CMAKE_HELPER_BUILD_DIR" \
-    --target install-{llvm,mlir,circt}-headers
+  --build "$CMAKE_HELPER_BUILD_DIR" \
+  --target install-{llvm,mlir,circt}-headers
