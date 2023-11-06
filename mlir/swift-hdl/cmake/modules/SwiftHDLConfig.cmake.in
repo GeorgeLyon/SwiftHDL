@@ -1,0 +1,37 @@
+# This file allows users to call find_package(SwiftHDL) and pick up our targets.
+
+@SWIFT_HEDL_CONFIG_CODE@
+
+find_package(MLIR REQUIRED CONFIG
+             HINTS "@SWIFT_HEDL_CONFIG_MLIR_CMAKE_DIR@")
+
+set(SWIFT_HEDL_EXPORTED_TARGETS "@SWIFT_HEDL_EXPORTS@")
+set(SWIFT_HEDL_CMAKE_DIR "@SWIFT_HEDL_CONFIG_CMAKE_DIR@")
+set(SWIFT_HEDL_BINARY_DIR "@SWIFT_HEDL_CONFIG_BINARY_DIR@")
+set(SWIFT_HEDL_INCLUDE_DIRS "@SWIFT_HEDL_CONFIG_INCLUDE_DIRS@")
+set(SWIFT_HEDL_LIBRARY_DIRS "@SWIFT_HEDL_CONFIG_LIBRARY_DIRS@")
+set(SWIFT_HEDL_TOOLS_DIR "@SWIFT_HEDL_CONFIG_TOOLS_DIR@")
+
+set_property(GLOBAL PROPERTY SWIFT_HEDL_ALL_LIBS "@SWIFT_HEDL_ALL_LIBS@")
+set_property(GLOBAL PROPERTY SWIFT_HEDL_DIALECT_LIBS "@SWIFT_HEDL_DIALECT_LIBS@")
+set_property(GLOBAL PROPERTY SWIFT_HEDL_CONVERSION_LIBS "@SWIFT_HEDL_CONVERSION_LIBS@")
+set_property(GLOBAL PROPERTY SWIFT_HEDL_TRANSLATION_LIBS "@SWIFT_HEDL_TRANSLATION_LIBS@")
+
+# Provide all our library targets to users.
+@SWIFT_HEDL_CONFIG_INCLUDE_EXPORTS@
+
+# By creating these targets here, subprojects that depend on SwiftHDL's
+# tablegen-generated headers can always depend on these targets whether building
+# in-tree with SwiftHDL or not.
+if(NOT TARGET swift-hdl-tablegen-targets)
+  add_custom_target(swift-hdl-tablegen-targets)
+endif()
+if(NOT TARGET swift-hdl-headers)
+  add_custom_target(swift-hdl-headers)
+endif()
+if(NOT TARGET swift-hdl-generic-headers)
+  add_custom_target(swift-hdl-generic-headers)
+endif()
+if(NOT TARGET swift-hdl-doc)
+  add_custom_target(swift-hdl-doc)
+endif()

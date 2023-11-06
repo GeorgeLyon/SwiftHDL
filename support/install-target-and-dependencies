@@ -36,7 +36,7 @@ EOF
 #
 # Export GraphViz
 GRAPHVIZ_BASE="$CMAKE_HELPER_BUILD_ROOT/graphviz/dot"
-"$PROJECT_ROOT/.devcontainer/cmake-helper" print-configure-args | xargs cmake \
+"$PROJECT_ROOT/.devcontainer/cmake-tools-helper" print-configure-args | xargs cmake \
   "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}" \
   -B"$CMAKE_HELPER_BUILD_DIR" \
   --graphviz="$GRAPHVIZ_BASE"
