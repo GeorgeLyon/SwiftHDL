@@ -25,7 +25,8 @@ EOF
 )
 
 SUPPORT_DIR="$SCRIPT_DIR"
-METADATA_DIR="$SUPPORT_DIR/metadata"
+METADATA_DIR="$SUPPORT_DIR/circt-metadata"
+mkdir -p "$METADATA_DIR"
 
 # Parse Arguments
 TARGET_COMMITISH=""
@@ -90,7 +91,8 @@ assert_repo_is_clean() {
 }
 
 # Checkout or update (fetch) the CIRCT repo
-CHECKOUT_DIR="$SUPPORT_DIR/.checkout"
+CHECKOUT_DIR="$SUPPORT_DIR/.circt-helper/checkout"
+mkdir -p "$CHECKOUT_DIR"
 if [ ! -d "$CHECKOUT_DIR" ]; then 
   echo "▸ Cloning CIRCT repo to ${CHECKOUT_DIR}…"
   git clone --recurse-submodules https://github.com/llvm/circt.git "$CHECKOUT_DIR"
@@ -102,7 +104,7 @@ else
 fi
 
 # Clear the snapshots directory in preparation for creating new snapshots
-SNAPSHOTS_DIR="$SUPPORT_DIR/.snapshots"
+SNAPSHOTS_DIR="$SUPPORT_DIR/.circt-helper/snapshots"
 echo "▸ Deleting existing snapshots in ${SNAPSHOTS_DIR}…"
 rm -rf "$SNAPSHOTS_DIR"
 mkdir "$SNAPSHOTS_DIR"
@@ -225,6 +227,7 @@ diff_helper "$SNAPSHOTS_DIR" "source" "input" | \
 
 # At this point, the "output" snapshot should represent the managed sources we want in the repo. The last thing to do is to sync the state back into the repo and update the metadata.
 echo "▸ Writing output snapshot back to repo…"
+mkdir -p "$MLIR_DIR"
 
 # If there are case differences between the output snapshot and the repo, rsync will override them but git will not recognize that the file has been renamed. To work around this, we manually rename the files before rsyncing.
 (
@@ -257,7 +260,7 @@ cat "$TARGET_SNAPSHOT_DIR-circt.sha" > "$METADATA_DIR/circt.sha"
 find "$MLIR_DIR/"{llvm,circt} -type f -print0 | \
   xargs -0 git -C "$PROJECT_ROOT" add -f
 # Make sure any deleted files, as well as metadata (shas and diffs), are added as well.
-git -C "$PROJECT_ROOT" add "$MLIR_DIR/"{llvm,circt,support/metadata}
+git -C "$PROJECT_ROOT" add "$MLIR_DIR/"{llvm,circt} "$METADATA_DIR"
 
 case "$CHECK_METADATA_CONSISTENCY" in
   "ON")
