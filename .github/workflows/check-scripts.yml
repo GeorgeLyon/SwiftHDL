@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Check CIRCT consistency
         run: |
-          ./mlir/support/circt-helper check-metadata-consistency
+          ./support/circt-helper check-metadata-consistency
   shellcheck-helper-scripts:
     name: Run ShellCheck on helper scripts
     runs-on: ubuntu-latest
@@ -43,4 +43,4 @@ jobs:
         runCmd: |
           shellcheck --version
           shellcheck .devcontainer/{cmake-tools,devcontainer}-helper
-          shellcheck support/{circt-helper,install-target-and-dependencies}
+          shellcheck support/{{circt,cmake}-helper,install-target-and-dependencies}

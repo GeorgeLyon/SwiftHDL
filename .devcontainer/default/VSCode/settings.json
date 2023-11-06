@@ -44,6 +44,7 @@
   "lldb.library": "/swift/usr/lib/liblldb.so",
   "lldb.launch.expressions": "native",
   "swift.searchSubfoldersForPackages": true,
+  "swift.sourcekit-lsp.supported-languages": [ "swift" ],
 
   // -- Clangd Settings
   "clangd.checkUpdates": false,
