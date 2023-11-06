@@ -36,10 +36,12 @@ EOF
 #
 # Export GraphViz
 GRAPHVIZ_BASE="$CMAKE_HELPER_BUILD_ROOT/graphviz/dot"
-"$PROJECT_ROOT/.devcontainer/cmake-tools-helper" print-configure-args | xargs cmake \
-  "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}" \
-  -B"$CMAKE_HELPER_BUILD_DIR" \
-  --graphviz="$GRAPHVIZ_BASE"
+"$PROJECT_ROOT/.devcontainer/cmake-tools-helper" print-configure-args |
+  xargs cmake \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" \
+    -B"$CMAKE_HELPER_BUILD_DIR" \
+    --graphviz="$GRAPHVIZ_BASE"
     
 # Get transitive dependencies
 TRANSITIVE_DEPENDENCIES_FILE="${CMAKE_INSTALL_PREFIX}/$ROOT_TARGET-trasitive-dependencies.txt"

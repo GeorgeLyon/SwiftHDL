@@ -29,8 +29,6 @@ case "$1" in
     sed 's@//.*@@' < "$VSCODE_SETTINGS_FILE" | \
       sed "s@\${[A-Za-z]*orkspaceFolder}@$PROJECT_ROOT@" | \
       jq -jr '"\"\(.["cmake.configureArgs"] | join("\"\n\""))\"\n-S\(.["cmake.sourceDirectory"])\n-G \(.["cmake.generator"])\n"'
-    echo "\"-DCMAKE_BUILD_TYPE=Debug\""
-    echo "$@"
 
     ;;
   "print-build-targets"|"print-test-targets")
