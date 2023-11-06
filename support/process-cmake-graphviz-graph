@@ -1,0 +1,141 @@
+#!/usr/bin/env swift
+
+import Foundation
+import RegexBuilder
+
+/**
+ A commandline tool which processes CMake's GraphViz output to emit a list of CMake targets (prefixed with "external:" or "internal:") such that a target will occur earlier in the list than any of its dependencies. This is needed to generate the pkg-config file (since providing the -l arguments in the wrong order can lead to unresolved symbols).
+
+ Note that the logic in this script is deeply coupled with CMake's GraphViz output format, which is not well documented or guaranteed to be stable. I unfortunately have not yet found a better way to automate this process.
+ */
+
+struct Target {
+  enum Kind: String {
+    case `internal` = "octagon"
+    case external = "septagon"
+  }
+}
+
+private enum Regexes {
+  // Regex for parsing target definitions emitted by CMake, for example:
+  //     "node223" [ label = "CIRCTFirtool", shape = octagon ];
+  static let targetNameReference = Reference(Substring.self)
+  static let targetKindReference = Reference(Target.Kind.self)
+  static let targetDefinition = Regex {
+    Anchor.startOfLine
+    ZeroOrMore(.whitespace)
+    Private.nodeName
+    " [ label = \""
+    Capture(as: targetNameReference) {
+      Private.targetName
+    }
+    "\", shape = "
+    Capture(as: targetKindReference) {
+      ChoiceOf {
+        Target.Kind.internal.rawValue
+        Target.Kind.external.rawValue
+      } 
+    } transform: { Target.Kind(rawValue: String($0))! }
+    " ];"
+    Anchor.endOfLine
+  }
+
+  // Regex for parsing target relationships emitted by CMake, for example:
+  //   "node150" -> "node138"  // CIRCTFIRRTL -> CIRCTHW
+  static let dependeeReference = Reference(Substring.self)
+  static let dependerReference = Reference(Substring.self)
+  static let targetRelationship = Regex {
+    Anchor.startOfLine
+    ZeroOrMore(.whitespace)
+    Private.nodeName
+    " -> "
+    Private.nodeName
+    ZeroOrMore(.any)
+    "//"
+    ZeroOrMore(.whitespace)
+    Capture(as: dependerReference) {
+      Private.targetName
+    }
+    " -> "
+    Capture(as: dependeeReference) {
+      Private.targetName
+    }
+    ZeroOrMore(.whitespace)
+    Anchor.endOfLine
+  }
+
+  private enum Private {
+    static let nodeName = Regex {
+      "\"node"
+      OneOrMore(.digit)
+      "\""
+    }
+    static let targetName = Regex {
+      OneOrMore(.word)
+      Optionally {
+        "::"
+        OneOrMore(.word)
+      }
+    }
+  }
+}
+
+// Parse input
+var targetKinds = [String: Target.Kind]()
+var dependencies = [String: Set<String>]()
+while let line = readLine() {
+  if let definitionMatch = line.wholeMatch(of: Regexes.targetDefinition) {
+    let targetName = String(definitionMatch[Regexes.targetNameReference])
+    let targetKind = definitionMatch[Regexes.targetKindReference]
+    if let kind = targetKinds[targetName] {
+      precondition(targetKind == kind)
+    } else {
+      targetKinds[targetName] = targetKind
+    }
+  } else if let relationshipMatch = line.wholeMatch(of: Regexes.targetRelationship) {
+    let dependee = String(relationshipMatch[Regexes.dependeeReference])
+    let depender = String(relationshipMatch[Regexes.dependerReference])
+    dependencies[depender, default: []].insert(dependee)
+    dependencies[dependee] = dependencies[dependee] ?? []
+  }
+}
+
+// Create `orderedTargets`, where each target has a smaller index than any targets which dependen on it
+var orderedTargets = [String]()
+while !dependencies.isEmpty {
+  let readyTargets = dependencies
+    .filter { $0.value.isEmpty }
+    .keys
+  guard !readyTargets.isEmpty else {
+    print("Invalid graph, cannot make progress.")
+    exit(1)
+  }
+  for targetName in readyTargets {
+    dependencies.removeValue(forKey: targetName)
+    for key in dependencies.keys {
+      dependencies[key]?.remove(targetName)
+    }
+
+    let targetKind = targetKinds.removeValue(forKey: targetName)!
+    switch targetKind {
+    case .internal:
+      orderedTargets.append("internal: \(targetName)")
+    case .external:
+      // Some external targets need to be mapped to their real name
+      switch targetName {
+        case "Terminfo::terminfo":
+          orderedTargets.append("external: ncurses")
+          break
+        case "ZLIB::ZLIB":
+          orderedTargets.append("external: z")
+          break
+        default:
+          orderedTargets.append("external: \(targetName)")
+      }
+    }
+  }
+}
+
+orderedTargets.reversed().forEach { print($0) }
+
+precondition(targetKinds.isEmpty)

@@ -1,0 +1,64 @@
+{
+  // -- CMake Tools
+  "cmake.sourceDirectory": "${workspaceFolder}/mlir/llvm/llvm",
+  "cmake.buildDirectory": "${workspaceFolder}/build/${workspaceFolderBasename}",
+  "cmake.installPrefix": "/usr/local",
+  "cmake.configureOnOpen": false,
+  "cmake.configureOnEdit": false,
+  "cmake.generator": "Ninja",
+  "cmake.configureArgs": [
+    // CMAKE
+    "-DCMAKE_WARN_DEPRECATED=OFF",
+    "-DCMAKE_C_COMPILER=clang",
+    "-DCMAKE_C_COMPILER_LAUNCHER=ccache",
+    "-DCMAKE_CXX_COMPILER=clang++",
+    "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache",
+
+    // LLVM
+    "-DLLVM_ENABLE_ASSERTIONS=ON",
+    "-DLLVM_ENABLE_PROJECTS=mlir",
+    "-DLLVM_TARGETS_TO_BUILD=host",
+    "-DLLVM_BUILD_EXAMPLES=OFF",
+    "-DLLVM_ENABLE_OCAMLDOC=OFF",
+    "-DLLVM_ENABLE_BINDINGS=OFF",
+    "-DLLVM_ENABLE_MODULES=OFF",
+    "-DLLVM_USE_SANITIZER=",
+
+    // LLVM (performance)
+    // "-DLLVM_USE_LINKER=lld", Not yet compatible with Swift
+    "-DLLVM_OPTIMIZED_TABLEGEN=ON",
+    "-DLLVM_USE_SPLIT_DWARF=ON",
+
+    // CIRCT
+    "-DLLVM_EXTERNAL_PROJECTS=circt",
+    "-DLLVM_EXTERNAL_CIRCT_SOURCE_DIR=${workspaceFolder}/mlir/circt",
+    "-DCIRCT_LLHD_SIM_ENABLED=OFF"
+  ],
+
+  // -- Swift
+  "lldb.library": "/swift/usr/lib/liblldb.so",
+  "lldb.launch.expressions": "native",
+  "swift.searchSubfoldersForPackages": true,
+
+  // -- Clangd Settings
+  "clangd.checkUpdates": false,
+  "clangd.onConfigChanged": "restart",
+  "clangd.arguments": [
+    "--all-scopes-completion",
+    "--compile-commands-dir=${workspaceFolder}/build/${workspaceFolderBasename}",
+    "--header-insertion=never",
+    "--clang-tidy",
+    "--pch-storage=memory"
+  ],
+
+  // -- MLIR LSP Server
+  "mlir.onSettingsChanged": "restart",
+
+  // -- Other
+  "search.exclude": {
+    "**/.ninja_log": true,
+    "**/*.ninja": true,
+    "build/**/*.json": true,
+    "build/**/CMakeFiles": true
+  }
+}

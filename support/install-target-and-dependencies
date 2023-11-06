@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Not the most elegant solution, but I haven't figured out a better way to get CMake to do this for me
+
+# Installs the specified CMake target and all targets it depends on
+if [[ $# -ne 1 ]]; then
+  echo "Usage: install-target-and-dependencies <target-name>"
+  echo "  Installs the specified target and its dependencies"
+fi
+ROOT_TARGET="$1"
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PROJECT_ROOT=$(dirname "$SCRIPT_DIR")
+
+CMAKE_HELPER_BUILD_ROOT=${CMAKE_HELPER_BUILD_ROOT:-$PROJECT_ROOT/build}
+CMAKE_HELPER_BUILD_DIR=${CMAKE_HELPER_BUILD_DIR:-$CMAKE_HELPER_BUILD_ROOT/$(basename "$PROJECT_ROOT")}
+
+CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX:-$CMAKE_HELPER_BUILD_ROOT/install}
+
+#
+# GraphViz Options
+mkdir -p "$CMAKE_HELPER_BUILD_DIR"
+cat << EOF > "$CMAKE_HELPER_BUILD_DIR/CMakeGraphVizOptions.cmake"
+set(GRAPHVIZ_EXECUTABLES OFF)
+set(GRAPHVIZ_STATIC_LIBS ON)
+set(GRAPHVIZ_SHARED_LIBS OFF)
+set(GRAPHVIZ_MODULE_LIBS ON)
+set(GRAPHVIZ_OBJECT_LIBS OFF)
+set(GRAPHVIZ_GENERATE_DEPENDERS OFF)
+set(GRAPHVIZ_EXTERNAL_LIBS ON)
+set(GRAPHVIZ_IGNORE_TARGETS "")
+EOF
+
+#
+# Export GraphViz
+GRAPHVIZ_BASE="$CMAKE_HELPER_BUILD_ROOT/graphviz/dot"
+"$PROJECT_ROOT/.devcontainer/cmake-helper" print-configure-args | xargs cmake \
+  "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}" \
+  -B"$CMAKE_HELPER_BUILD_DIR" \
+  --graphviz="$GRAPHVIZ_BASE"
+    
+# Get transitive dependencies
+TRANSITIVE_DEPENDENCIES_FILE="${CMAKE_INSTALL_PREFIX}/$ROOT_TARGET-trasitive-dependencies.txt"
+mkdir -p "${CMAKE_INSTALL_PREFIX}"
+"$SCRIPT_DIR/process-cmake-graphviz-graph" < "$GRAPHVIZ_BASE.$ROOT_TARGET" \
+  > "$TRANSITIVE_DEPENDENCIES_FILE"
+
+# Create pkg-config file
+PKG_CONFIG_DIR="$CMAKE_INSTALL_PREFIX/pkgconfig"
+mkdir -p "$PKG_CONFIG_DIR"
+cat << EOF > "$PKG_CONFIG_DIR/${ROOT_TARGET}.pc"
+Name: ${ROOT_TARGET}
+CFlags: -I${CMAKE_INSTALL_PREFIX}/include
+Libs: -L${CMAKE_INSTALL_PREFIX}/lib $(sed -E 's/^(internal|external): /-l/' < "$TRANSITIVE_DEPENDENCIES_FILE" | tr '\n' ' ')
+EOF
+
+# Install internal libraries and headers
+sed -n 's/^internal: \(.*\)/install-\1/p' < "$TRANSITIVE_DEPENDENCIES_FILE" | xargs cmake \
+    --build "$CMAKE_HELPER_BUILD_DIR" \
+    --target install-{llvm,mlir,circt}-headers
