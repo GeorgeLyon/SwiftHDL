@@ -1,1 +1,1 @@
-add_subdirectory(Placeholder)
+add_subdirectory(SwiftHDL)

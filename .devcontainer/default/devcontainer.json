@@ -29,7 +29,8 @@
         "ms-vscode.cmake-tools",
         "sswg.swift-lang",
         "timonwong.shellcheck",
-        "vadimcn.vscode-lldb"
+        "vadimcn.vscode-lldb",
+        "vknabel.vscode-apple-swift-format"
       ],
       "settings": {
         // This must be set in devcontainer.json because they must be absolute paths and thus cannot use `${workspaceFolder}` if defined in `settings.json`

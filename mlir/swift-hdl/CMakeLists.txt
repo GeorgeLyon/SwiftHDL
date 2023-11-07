@@ -172,6 +172,18 @@ if (SWIFT_HDL_INCLUDE_DOCS)
   add_subdirectory(docs)
 endif()
 
+install(DIRECTORY include/swift-hdl
+  DESTINATION include
+  COMPONENT swift-hdl-headers
+  FILES_MATCHING
+  PATTERN "*.def"
+  PATTERN "*.h"
+  PATTERN "*.inc"
+  PATTERN "*.td"
+  PATTERN "*.sv"
+  PATTERN "LICENSE.TXT"
+  )
+
 install(DIRECTORY ${SWIFT_HDL_INCLUDE_DIR}/swift-hdl
   DESTINATION include
   COMPONENT swift-hdl-headers
