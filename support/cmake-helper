@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Uses cmake-tools-helper to invoke CMake from the command line
+
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PROJECT_ROOT=$(dirname "$SCRIPT_DIR")
+
+CMAKE_HELPER_BUILD_ROOT=${CMAKE_HELPER_BUILD_ROOT:-$PROJECT_ROOT/build}
+CMAKE_HELPER_BUILD_DIR=${CMAKE_HELPER_BUILD_DIR:-$CMAKE_HELPER_BUILD_ROOT/$(basename "$PROJECT_ROOT")}
+
+if [[ $# -ne 1 ]]; then
+  echo "Usage: $0 [configure|build|test]"
+  exit 1
+fi
+
+case "$1" in
+  "configure")
+    "$PROJECT_ROOT/.devcontainer/cmake-tools-helper" print-configure-args |
+      xargs cmake \
+        "-DCMAKE_BUILD_TYPE=Debug" \
+        "-B$CMAKE_HELPER_BUILD_DIR"
+
+    # Create a compile_commands.json link in build/ (which is where clangd looks for it by default)
+    rm -f "$PROJECT_ROOT/build/compile_commands.json"
+    ln -s "$CMAKE_HELPER_BUILD_DIR/compile_commands.json" "$PROJECT_ROOT/build/compile_commands.json"
+    ;;
+  "build"|"test")
+    ./.devcontainer/cmake-tools-helper "print-$1-targets" |
+      xargs cmake \
+        --build "$CMAKE_HELPER_BUILD_DIR" \
+        --target
+    ;;
+  *)
+    echo "Usage: $0 [configure|build|test]"
+    exit 1
+    ;;
+esac

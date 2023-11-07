@@ -24,7 +24,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        // "llvm-vs-code-extensions.vscode-clangd", (Conflicts with sourcekit-lsp)
+        "llvm-vs-code-extensions.vscode-clangd",
         "llvm-vs-code-extensions.vscode-mlir",
         "ms-vscode.cmake-tools",
         "sswg.swift-lang",

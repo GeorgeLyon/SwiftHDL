@@ -1,0 +1,56 @@
+name: Check Support Scripts
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    paths:
+      - ./.devcontainer/**
+      - ./mlir/support
+    branches:
+      - main
+
+jobs:
+  check-metadata-consistency:
+    name: Check CIRCT metadata consistency
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-13]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check CIRCT consistency
+        run: |
+          ./support/circt-helper check-metadata-consistency
+      - name: Check consistency issues are properly detected
+        run: |
+          echo "Unexpected file" > mlir/circt/unexpected-file.txt
+          git config --local user.name "Robot"
+          git config --local user.email "robot@robot.robot"
+          git add -A
+          git commit -am "Bad commit"
+          if ./support/circt-helper check-metadata-consistency; then
+            echo "Metadata consistency check should have failed"
+            exit 1
+          fi
+
+  shellcheck-helper-scripts:
+    name: Run ShellCheck on helper scripts
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        devcontainer-name: ["default"]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Make devcontainer '${{ matrix.devcontainer-name }}' singular
+      run: .devcontainer/devcontainer-helper --make-singular ${{ matrix.devcontainer-name }}
+    - name: Shellcheck scripts in devcontainer
+      uses: devcontainers/ci@v0.3
+      with:
+        push: never
+        runCmd: |
+          shellcheck --version
+          shellcheck .devcontainer/{cmake-tools,devcontainer}-helper
+          shellcheck support/{{circt,cmake}-helper,install-target-and-dependencies}
