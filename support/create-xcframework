@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+set -x
+
+# Builds an xcframework for the current platform.
+# Based on https://forums.swift.org/t/how-to-build-swift-package-as-xcframework/41414/28
+
+if [[ $# -ne 0 ]]; then
+  echo "Usage: $0"
+  exit 1
+fi
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+PROJECT_BUILD_DIR="${PROJECT_BUILD_DIR:-"${PROJECT_ROOT}/build"}"
+XCODEBUILD_BUILD_DIR="$PROJECT_BUILD_DIR/xcodebuild"
+XCODEBUILD_DERIVED_DATA_PATH="$XCODEBUILD_BUILD_DIR/DerivedData"
+XCODEBUILD_ARCHIVE_PATH="$XCODEBUILD_BUILD_DIR/SwiftHDL-macos.xcarchive"
+
+rm -rf "$XCODEBUILD_ARCHIVE_PATH"
+
+case "$(arch)" in 
+"arm64")
+  EXCLUDED_ARCHS="x86_64"
+  ;;
+"x86_64")
+  EXCLUDED_ARCHS="arm64"
+  ;;
+*)
+  echo "Unsupported architecture: $(arch)"
+  exit 1
+  ;;
+esac
+
+export PKG_CONFIG_PATH="$PROJECT_BUILD_DIR/install/pkgconfig"
+
+cd "$PROJECT_ROOT/SwiftHDL"
+
+# Build Archive
+xcodebuild archive \
+  -scheme SwiftHDL \
+  -destination "generic/platform=macOS" \
+  -archivePath "$XCODEBUILD_ARCHIVE_PATH" \
+  -derivedDataPath "$XCODEBUILD_DERIVED_DATA_PATH" \
+  SKIP_INSTALL=NO \
+  BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+  EXCLUDED_ARCHS="$EXCLUDED_ARCHS"
+
+# Copy missing swiftmodules
+FRAMEWORK_MODULES_PATH="$XCODEBUILD_ARCHIVE_PATH/Products/usr/local/lib/SwiftHDL.framework/Modules"
+mkdir -p "$FRAMEWORK_MODULES_PATH"
+cp -r \
+  "$XCODEBUILD_DERIVED_DATA_PATH/Build/Intermediates.noindex/ArchiveIntermediates/SwiftHDL/BuildProductsPath/Release/SwiftHDL.swiftmodule" \
+  "$FRAMEWORK_MODULES_PATH/SwiftHDL.swiftmodule"
+
+# Combine into an xcframework
+xcodebuild -create-xcframework \
+  -framework "$XCODEBUILD_ARCHIVE_PATH/Products/usr/local/lib/SwiftHDL.framework" \
+  -debug-symbols "$XCODEBUILD_ARCHIVE_PATH/dSYMs/SwiftHDL.framework.dSYM" \
+  -output "$XCODEBUILD_BUILD_DIR/SwiftHDL.xcframework"

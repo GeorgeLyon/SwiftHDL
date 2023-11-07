@@ -11,7 +11,7 @@ PROJECT_ROOT=$(dirname "$SCRIPT_DIR")
 CMAKE_HELPER_BUILD_ROOT=${CMAKE_HELPER_BUILD_ROOT:-$PROJECT_ROOT/build}
 CMAKE_HELPER_BUILD_DIR=${CMAKE_HELPER_BUILD_DIR:-$CMAKE_HELPER_BUILD_ROOT/$(basename "$PROJECT_ROOT")}
 
-if [[ $# -ne 1 ]]; then
+if [[ $# -ne 0 ]]; then
   echo "Usage: $0 [configure|build|test]"
   exit 1
 fi

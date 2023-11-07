@@ -10,6 +10,7 @@ let package = Package(
   products: [
     .library(
       name: "SwiftHDL",
+      type: .dynamic,
       targets: ["SwiftHDL"])
   ],
   dependencies: [
