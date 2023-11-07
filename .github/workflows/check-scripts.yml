@@ -23,14 +23,24 @@ jobs:
       - name: Check CIRCT consistency
         run: |
           ./support/circt-helper check-metadata-consistency
+      - name: Check consistency issues are properly detected
+        run: |
+          echo "Unexpected file" > mlir/circt/unexpected-file.txt
+          git config --local user.name "Robot"
+          git config --local user.email "robot@robot.robot"
+          git add -A
+          git commit -am "Bad commit"
+          if ./support/circt-helper check-metadata-consistency; then
+            echo "Metadata consistency check should have failed"
+            exit 1
+          fi
+
   shellcheck-helper-scripts:
     name: Run ShellCheck on helper scripts
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         devcontainer-name: ["default"]
-    
     steps:
     - name: Checkout
       uses: actions/checkout@v3
