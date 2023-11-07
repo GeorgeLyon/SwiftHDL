@@ -1,0 +1,147 @@
+name: Create and Test XCFramework
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Create XCFramework
+    runs-on: macos-latest
+  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Set up devcontainer
+      - name: Make devcontainer '${{ matrix.devcontainer-name }}' singular
+        run: .devcontainer/devcontainer-helper --make-singular ${{ matrix.devcontainer-name }}
+      - name: Initialize devcontainer
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            echo "Devcontainer Initialized."
+
+      # Even though devcontainers/ci should support $GITHUB_OUTPUT, it doesn't seem to work, so instead we write everything to a file that we later write to $GITHUB_OUTPUT in a non-devcontainer step.
+      - name: Get cache key parts
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            git config --global --add safe.directory $PWD
+            rm -f .temporary-github-output
+            echo "llvm-hash=${{ hashFiles('mlir/llvm') }}" >> .temporary-github-output
+            echo "circt-hash=${{ hashFiles('mlir/circt') }}" >> .temporary-github-output
+            echo "repo-hash=$(git rev-parse HEAD)" >> .temporary-github-output
+            . /etc/lsb-release
+            echo "cache-key-prefix=\"ccache-${{ matrix.devcontainer-name }}-${DISTRIB_ID}_${DISTRIB_RELEASE}" >> .temporary-github-output
+      - name: Export cache key parts
+        id: cache-key-parts
+        run: |
+          cat .temporary-github-output
+          cat .temporary-github-output >> $GITHUB_OUTPUT
+          rm .temporary-github-output
+
+      - name: Restore ccache database
+        uses: actions/cache/restore@v3
+        with: 
+          path: ccache
+          key: ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}-repo_${{ steps.cache-key-parts.outputs.repo-hash }}
+          restore-keys: |
+            ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}-repo_
+            ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_
+            ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_
+      
+      - name: Initialize ccache
+        uses: devcontainers/ci@v0.3
+        with:
+          # We configure ccache to not evict anything during compilation, and we perform a cleanup after compilation completes
+          push: never
+          runCmd: |
+            date +%s > .workflow-start-seconds
+            export CCACHE_DIR=$PWD/ccache
+            ccache -M 1600GB
+            ccache -sv
+            ccache -z
+
+      - name: Configure CMake Project
+        id: configure-cmake-project
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            export CCACHE_DIR=$PWD/ccache
+            git config --global --add safe.directory $PWD
+            ./support/cmake-helper configure
+
+      - name: Build CMake Project
+        id: build-cmake-project
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            export CCACHE_DIR=$PWD/ccache
+            ./support/cmake-helper build
+
+      # Re-run the build if it fails (should be a quick incremental build) so that errors are logged without all the CMake noise.
+      - name: Log build errors
+        # https://docs.github.com/en/actions/learn-github-actions/expressions#example-of-failure-with-conditions
+        # https://github.com/actions/runner/blob/main/docs/adrs/0274-step-outcome-and-conclusion.md
+        if: ${{ failure() && steps.build-cmake-project.outcome == 'failure' }}
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            export CCACHE_DIR=$PWD/ccache
+            ./support/cmake-helper build
+
+      - name: Test CMake Project
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            export CCACHE_DIR=$PWD/ccache
+            ./support/cmake-helper test
+
+      - name: Clean up ccache and log stats
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            export CCACHE_DIR=$PWD/ccache
+            ccache -sv
+            ccache -M 1GB
+            ccache --cleanup
+            ccache -sv
+
+      # Save the cache prior to pruning it. We save the cache as long as the "configure" step was successful, since meaningful work may have been done even if subsequent steps failed.
+      - name: Save ccache database
+        uses: actions/cache/save@v3
+        if: ${{ always() && steps.configure-cmake-project.outcome == 'success' }}
+        with: 
+          path: ccache
+          key: ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}-repo_${{ steps.cache-key-parts.outputs.repo-hash }}
+
+      # If evicting everything that wasn't used this workflow does not reduce the cache past its maximum, it may benefit performance to increase the cache size.
+      - name: Log ccache estimated usage
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            export CCACHE_DIR=$PWD/ccache
+            ccache --evict-older-than $(($(date +%s) - $(cat .workflow-start-seconds)))s
+            ccache -sv
+            rm .workflow-start-seconds
+      
+      - name: Check that repository is clean
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            git config --global --add safe.directory $PWD
+            .devcontainer/devcontainer-helper --clean
+            git diff --exit-code

@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import SwiftHDL
 
 final class SwiftHDLTests: XCTestCase {
