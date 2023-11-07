@@ -17,11 +17,18 @@ if [[ $# -ne 1 ]]; then
 fi
 
 case "$1" in
+  "print-configure-args")
+    "$PROJECT_ROOT/.devcontainer/cmake-tools-helper" print-configure-args
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      echo "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13"
+    fi
+    ;;
   "configure")
-    "$PROJECT_ROOT/.devcontainer/cmake-tools-helper" print-configure-args |
+    "${BASH_SOURCE[0]}" print-configure-args |
       xargs cmake \
-        "-DCMAKE_BUILD_TYPE=Debug" \
-        "-B$CMAKE_HELPER_BUILD_DIR"
+        "-B$CMAKE_HELPER_BUILD_DIR" \
+        ${CMAKE_OSX_DEPLOYMENT_TARGET:+-DCMAKE_OSX_DEPLOYMENT_TARGET="$CMAKE_OSX_DEPLOYMENT_TARGET"} \
+        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Debug}"
 
     # Create a compile_commands.json link in build/ (which is where clangd looks for it by default)
     rm -f "$PROJECT_ROOT/build/compile_commands.json"
