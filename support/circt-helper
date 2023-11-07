@@ -229,6 +229,14 @@ diff_helper "$SNAPSHOTS_DIR" "source" "input" | \
 echo "▸ Writing output snapshot back to repo…"
 mkdir -p "$MLIR_DIR"
 
+# Capture the diff from output to target, since the line numbers from the source diff might have been offset in the target snapshot. Also, we split the diff into two for easier comprehension.
+diff_helper "$SNAPSHOTS_DIR" {target,output}/llvm > "$METADATA_DIR/llvm.diff"
+diff_helper "$SNAPSHOTS_DIR" {target,output}/circt > "$METADATA_DIR/circt.diff"
+
+# Finally, save the current CIRCT and LLVM SHAs to the metadata directory. Note that the LLVM SHA is strictly informative and has no effect on the managed sources.
+cat "$TARGET_SNAPSHOT_DIR-llvm.sha" > "$METADATA_DIR/llvm.sha"
+cat "$TARGET_SNAPSHOT_DIR-circt.sha" > "$METADATA_DIR/circt.sha"
+
 # If there are case differences between the output snapshot and the repo, rsync will override them but git will not recognize that the file has been renamed. To work around this, we manually rename the files before rsyncing.
 (
   cd "$OUTPUT_SNAPSHOT_DIR"
@@ -248,14 +256,6 @@ rsync -avqt --delete{,-excluded} \
 rsync -avqt --delete{,-excluded} \
   "$OUTPUT_SNAPSHOT_DIR/circt/" "$MLIR_DIR/circt"
 
-# Capture the diff from output to target, since the line numbers from the source diff might have been offset in the target snapshot. Also, we split the diff into two for easier comprehension.
-diff_helper "$SNAPSHOTS_DIR" {target,output}/llvm > "$METADATA_DIR/llvm.diff"
-diff_helper "$SNAPSHOTS_DIR" {target,output}/circt > "$METADATA_DIR/circt.diff"
-
-# Finally, save the current CIRCT and LLVM SHAs to the metadata directory. Note that the LLVM SHA is strictly informative and has no effect on the managed sources.
-cat "$TARGET_SNAPSHOT_DIR-llvm.sha" > "$METADATA_DIR/llvm.sha"
-cat "$TARGET_SNAPSHOT_DIR-circt.sha" > "$METADATA_DIR/circt.sha"
-
 # llvm and circt inherit the gitignore settings from the repo root, so we force-add all the sources in the output snapshot to ensure they make it in the index.
 find "$MLIR_DIR/"{llvm,circt} -type f -print0 | \
   xargs -0 git -C "$PROJECT_ROOT" add -f
@@ -265,8 +265,8 @@ git -C "$PROJECT_ROOT" add "$MLIR_DIR/"{llvm,circt} "$METADATA_DIR"
 case "$CHECK_METADATA_CONSISTENCY" in
   "ON")
     echo "▸ Checking metadata consistency…"
-    # If we are running check-metadata-consistency, then the target SHA was set to the source SHA and neither the managed sources nor the metadata should have changed.
-    if ! git -C "$PROJECT_ROOT" diff --exit-code -- "$MLIR_DIR/"{llvm,circt,support/metadata}; then 
+    # If we are running check-metadata-consistency, then neither the sources nor the metadata should have changed.
+    if ! git -C "$PROJECT_ROOT" diff --exit-code --staged -- "$MLIR_DIR/"{llvm,circt} "$METADATA_DIR"; then 
       echo "▸ Found inconsistent metadata."
       exit 1
     else
