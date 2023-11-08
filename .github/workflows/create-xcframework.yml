@@ -16,11 +16,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install Swift 5.9
-        uses: compnerd/gha-setup-swift@main
-        with:
-          branch: swift-5.9-release
-          tag: 5.9-RELEASE
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v1
 
       - name: Install Ninja
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -31,11 +28,16 @@ jobs:
           curl -L https://github.com/ccache/ccache/releases/download/v4.8.3/ccache-4.8.3-darwin.tar.gz | tar xz --strip-components=1 -C .ccache
           echo "$PWD/.ccache" >> $GITHUB_PATH
           echo "CCACHE_DIR=$PWD/ccache" >> $GITHUB_ENV
+        
+      - name: Validate Installed Tools
+        run: |
+          swift --version
+          ninja --version
+          ccache --version
 
       - name: Get cache key parts
         id: cache-key-parts
         run: |
-          ccache --version
           echo "llvm-hash=${{ hashFiles('mlir/llvm') }}" >> $GITHUB_OUTPUT
           echo "circt-hash=${{ hashFiles('mlir/circt') }}" >> $GITHUB_OUTPUT
           echo "repo-hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
