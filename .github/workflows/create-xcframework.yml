@@ -20,8 +20,9 @@ jobs:
         run: |
           mkdir .ccache
           curl -L https://github.com/ccache/ccache/releases/download/v4.8.3/ccache-4.8.3-darwin.tar.gz | tar xz --strip-components=1 -C .ccache
-          export PATH=$PWD/.ccache:$PATH
-          ccache --version
+          echo "$PWD/.ccache" >> $GITHUB_PATH
+          echo "CCACHE_DIR=$PWD/ccache" >> $GITHUB_ENV
+          ccache
 
       - name: Get cache key parts
         id: cache-key-parts
@@ -45,14 +46,12 @@ jobs:
         # We configure ccache to not evict anything during compilation, and we perform a cleanup after compilation completes
         run: |
           date +%s > .workflow-start-seconds
-          export CCACHE_DIR=$PWD/ccache
           ccache -M 1600GB
           ccache -sv
           ccache -z
 
       - name: Install SwiftHDL
         run: |
-          export CCACHE_DIR=$PWD/ccache
           ./support/install-target-and-dependencies SwiftHDL
 
       - name: Create xcframework
@@ -64,15 +63,11 @@ jobs:
           swift test --package-path test-project/TestXCFramework
 
       - name: Clean up ccache and log stats
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            export CCACHE_DIR=$PWD/ccache
-            ccache -sv
-            ccache -M 1GB
-            ccache --cleanup
-            ccache -sv
+        run: |
+          ccache -sv
+          ccache -M 1GB
+          ccache --cleanup
+          ccache -sv
 
       # Save the cache prior to pruning it. We save the cache unconditionally since installing SwiftHDL may have made meaningful progress even if it eventually failed.
       - name: Save ccache database
@@ -84,18 +79,11 @@ jobs:
 
       # If evicting everything that wasn't used this workflow does not reduce the cache past its maximum, it may benefit performance to increase the cache size.
       - name: Log ccache estimated usage
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            export CCACHE_DIR=$PWD/ccache
-            ccache --evict-older-than $(($(date +%s) - $(cat .workflow-start-seconds)))s
-            ccache -sv
-            rm .workflow-start-seconds
+        run: |
+          ccache --evict-older-than $(($(date +%s) - $(cat .workflow-start-seconds)))s
+          ccache -sv
+          rm .workflow-start-seconds
       
       - name: Check that repository is clean
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            git diff --exit-code
+        run: |
+          git diff --exit-code
