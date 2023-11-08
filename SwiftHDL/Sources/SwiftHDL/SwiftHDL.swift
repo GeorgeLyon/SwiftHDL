@@ -8,7 +8,6 @@ public enum SwiftHDL {
       let stringRef = llvm.StringRef(buffer.baseAddress, buffer.count)
       return mlir.StringAttr.get(context, llvm.Twine(stringRef))
     }
-    print("GEORGE: \(attribute.str())")
     return String(attribute.str())
   }
 }
