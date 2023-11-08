@@ -71,7 +71,7 @@ jobs:
 
       - name: Test xcframework
         run: |
-          swift test --package-path test-project/TestXCFramework
+          swift test --package-path test-projects/TestXCFramework
 
       - name: Clean up ccache and log stats
         run: |
