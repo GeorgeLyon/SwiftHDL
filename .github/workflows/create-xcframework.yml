@@ -19,7 +19,7 @@ jobs:
       - name: Install and setup required tools
         run: |
           brew install ccache ninja
-          xcode-select --switch /Applications/Xcode_15.0.1.app/Contents/Developer
+          sudo xcode-select --switch /Applications/Xcode_15.0.1.app/Contents/Developer
           swift --version
           ninja --version
           ccache --version
