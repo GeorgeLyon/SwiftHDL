@@ -10,16 +10,15 @@ on:
 jobs:
   formatting-swift:
     name: Check Swift Formatting
-    runs-on: ubuntu-latest
+    runs-on: macos-13
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Format Swift code
         run: |
-          swift build --package-path SwiftHDL --product swift-format 
-          SWIFT_FORMAT="$(swift build --package-path SwiftHDL --product swift-format --show-bin-path)/swift-format"
+          brew install swift-format@509.0.0
           for PACKAGE_PATH in "SwiftHDL" "test-projects/TestXCFramework"; do
-            "$SWIFT_FORMAT" format --in-place --parallel --recursive "$PACKAGE_PATH"/{Sources,Tests,Package.swift}
+            swift-format format --in-place --parallel --recursive "$PACKAGE_PATH"/{Sources,Tests,Package.swift}
           done
       - name: Check that no diff was created
         run: |
