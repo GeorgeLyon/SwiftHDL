@@ -15,6 +15,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Install ccache
+        run: |
+          mkdir .ccache
+          curl -L https://github.com/ccache/ccache/releases/download/v4.8.3/ccache-4.8.3-darwin.tar.gz | tar xz --strip-components=1 -C .ccache
+          export PATH=$PWD/.ccache:$PATH
+          ccache --version
+
       - name: Get cache key parts
         id: cache-key-parts
         run: |
