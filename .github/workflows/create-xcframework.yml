@@ -18,11 +18,9 @@ jobs:
       - name: Get cache key parts
         id: cache-key-parts
         run: |
-          git config --global --add safe.directory $PWD
           echo "llvm-hash=${{ hashFiles('mlir/llvm') }}" >> $GITHUB_OUTPUT
           echo "circt-hash=${{ hashFiles('mlir/circt') }}" >> $GITHUB_OUTPUT
           echo "repo-hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-          . /etc/lsb-release
           echo "cache-key-prefix=\"xcframework-ccache" >> $GITHUB_OUTPUT
 
       - name: Restore ccache database
@@ -92,5 +90,4 @@ jobs:
         with:
           push: never
           runCmd: |
-            git config --global --add safe.directory $PWD
             git diff --exit-code

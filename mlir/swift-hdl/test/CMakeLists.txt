@@ -12,7 +12,7 @@ add_lit_testsuite(check-swift-hdl "Running the SwiftHDL regression tests"
   ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS 
     FileCheck count not
-    swift-hdl-placeholder-test
+    swift-hdl-test
     SwiftHDL_Swift_Test
   )
 set_target_properties(check-swift-hdl PROPERTIES FOLDER "Tests")

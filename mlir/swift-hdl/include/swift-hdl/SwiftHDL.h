@@ -5,4 +5,3 @@
 
 // Includes
 #include <circt/Firtool/Firtool.h>
-

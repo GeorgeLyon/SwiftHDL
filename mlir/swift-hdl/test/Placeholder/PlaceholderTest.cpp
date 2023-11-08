@@ -1,4 +1,4 @@
-// RUN: swift-hdl-placeholder-test 2>&1 | FileCheck %s
+// RUN: swift-hdl-test 2>&1 | FileCheck %s
 
 #include <llvm/Support/raw_ostream.h>
 #include <mlir/IR/BuiltinAttributes.h>
