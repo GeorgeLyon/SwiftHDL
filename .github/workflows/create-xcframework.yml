@@ -15,36 +15,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      # Set up devcontainer
-      - name: Make devcontainer '${{ matrix.devcontainer-name }}' singular
-        run: .devcontainer/devcontainer-helper --make-singular ${{ matrix.devcontainer-name }}
-      - name: Initialize devcontainer
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            echo "Devcontainer Initialized."
-
-      # Even though devcontainers/ci should support $GITHUB_OUTPUT, it doesn't seem to work, so instead we write everything to a file that we later write to $GITHUB_OUTPUT in a non-devcontainer step.
       - name: Get cache key parts
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            git config --global --add safe.directory $PWD
-            rm -f .temporary-github-output
-            echo "llvm-hash=${{ hashFiles('mlir/llvm') }}" >> .temporary-github-output
-            echo "circt-hash=${{ hashFiles('mlir/circt') }}" >> .temporary-github-output
-            echo "repo-hash=$(git rev-parse HEAD)" >> .temporary-github-output
-            . /etc/lsb-release
-            echo "cache-key-prefix=\"ccache-${{ matrix.devcontainer-name }}-${DISTRIB_ID}_${DISTRIB_RELEASE}" >> .temporary-github-output
-      - name: Export cache key parts
         id: cache-key-parts
         run: |
-          cat .temporary-github-output
-          cat .temporary-github-output >> $GITHUB_OUTPUT
-          rm .temporary-github-output
+          git config --global --add safe.directory $PWD
+          echo "llvm-hash=${{ hashFiles('mlir/llvm') }}" >> $GITHUB_OUTPUT
+          echo "circt-hash=${{ hashFiles('mlir/circt') }}" >> $GITHUB_OUTPUT
+          echo "repo-hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          . /etc/lsb-release
+          echo "cache-key-prefix=\"xcframework-ccache" >> $GITHUB_OUTPUT
 
       - name: Restore ccache database
         uses: actions/cache/restore@v3
@@ -57,55 +36,26 @@ jobs:
             ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_
       
       - name: Initialize ccache
-        uses: devcontainers/ci@v0.3
-        with:
-          # We configure ccache to not evict anything during compilation, and we perform a cleanup after compilation completes
-          push: never
-          runCmd: |
-            date +%s > .workflow-start-seconds
-            export CCACHE_DIR=$PWD/ccache
-            ccache -M 1600GB
-            ccache -sv
-            ccache -z
+        # We configure ccache to not evict anything during compilation, and we perform a cleanup after compilation completes
+        run: |
+          date +%s > .workflow-start-seconds
+          export CCACHE_DIR=$PWD/ccache
+          ccache -M 1600GB
+          ccache -sv
+          ccache -z
 
-      - name: Configure CMake Project
-        id: configure-cmake-project
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            export CCACHE_DIR=$PWD/ccache
-            git config --global --add safe.directory $PWD
-            ./support/cmake-helper configure
+      - name: Install SwiftHDL
+        run: |
+          export CCACHE_DIR=$PWD/ccache
+          ./support/install-target-and-dependencies SwiftHDL
 
-      - name: Build CMake Project
-        id: build-cmake-project
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            export CCACHE_DIR=$PWD/ccache
-            ./support/cmake-helper build
+      - name: Create xcframework
+        run: |
+          ./support/create-xcframework
 
-      # Re-run the build if it fails (should be a quick incremental build) so that errors are logged without all the CMake noise.
-      - name: Log build errors
-        # https://docs.github.com/en/actions/learn-github-actions/expressions#example-of-failure-with-conditions
-        # https://github.com/actions/runner/blob/main/docs/adrs/0274-step-outcome-and-conclusion.md
-        if: ${{ failure() && steps.build-cmake-project.outcome == 'failure' }}
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            export CCACHE_DIR=$PWD/ccache
-            ./support/cmake-helper build
-
-      - name: Test CMake Project
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            export CCACHE_DIR=$PWD/ccache
-            ./support/cmake-helper test
+      - name: Test xcframework
+        run: |
+          swift test --package-path test-project/TextXCFramework
 
       - name: Clean up ccache and log stats
         uses: devcontainers/ci@v0.3
@@ -118,10 +68,10 @@ jobs:
             ccache --cleanup
             ccache -sv
 
-      # Save the cache prior to pruning it. We save the cache as long as the "configure" step was successful, since meaningful work may have been done even if subsequent steps failed.
+      # Save the cache prior to pruning it. We save the cache unconditionally since installing SwiftHDL may have made meaningful progress even if it eventually failed.
       - name: Save ccache database
         uses: actions/cache/save@v3
-        if: ${{ always() && steps.configure-cmake-project.outcome == 'success' }}
+        if: always()
         with: 
           path: ccache
           key: ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}-repo_${{ steps.cache-key-parts.outputs.repo-hash }}
@@ -143,5 +93,4 @@ jobs:
           push: never
           runCmd: |
             git config --global --add safe.directory $PWD
-            .devcontainer/devcontainer-helper --clean
             git diff --exit-code
