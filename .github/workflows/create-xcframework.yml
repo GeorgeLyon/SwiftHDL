@@ -10,7 +10,7 @@ on:
 jobs:
   build-and-test:
     name: Create XCFramework
-    runs-on: macos-latest
+    runs-on: macos-13
   
     steps:
       - name: Checkout
@@ -25,8 +25,7 @@ jobs:
       - name: Install ccache
         run: |
           mkdir .ccache
-          curl -L https://github.com/ccache/ccache/releases/download/v4.8.3/ccache-4.8.3-darwin.tar.gz | tar xz --strip-components=1 -C .ccache
-          echo "$PWD/.ccache" >> $GITHUB_PATH
+          curl -L https://github.com/ccache/ccache/releases/download/v4.8.3/ccache-4.8.3-darwin.tar.gz | tar xz --strip-components=1 -C /usr/local/bin
           echo "CCACHE_DIR=$PWD/ccache" >> $GITHUB_ENV
         
       - name: Validate Installed Tools
