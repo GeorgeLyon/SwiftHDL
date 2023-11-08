@@ -9,6 +9,9 @@ let package = Package(
       name: "TestXCFramework",
       targets: ["TestXCFramework"])
   ],
+  dependencies: [
+    .package(url: "https://github.com/apple/swift-format", branch: "release/5.9")
+  ],
   targets: [
     .binaryTarget(
       name: "SwiftHDL",

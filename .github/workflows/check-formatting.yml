@@ -8,6 +8,22 @@ on:
       - main
 
 jobs:
+  formatting-swift:
+    name: Check Swift Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Format Swift code
+        run: |
+          for PACKAGE_PATH in "SwiftHDL" "test-projects/TestXCFramework"; do
+            swift run --package-path "$PACKAGE_PATH" swift-format format --in-place --parallel --recursive "$PACKAGE_PATH"/{Sources,Tests,Package.swift}
+          done
+      - name: Check that no diff was created
+        run: |
+          git diff
+          git diff --exit-code
+
   formatting-cpp:
     name: Check C++ Formatting
     runs-on: ubuntu-latest

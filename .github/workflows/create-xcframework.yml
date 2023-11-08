@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Swift
+      - name: Install Swift
         uses: swift-actions/setup-swift@v1
 
       - name: Install Ninja
@@ -67,6 +67,17 @@ jobs:
       - name: Create xcframework
         run: |
           ./support/create-xcframework
+
+      - name: Get Architecture
+        id: get-arch
+        run: |
+          echo "xcframework-arch=$(arch)" >> $GITHUB_OUTPUT
+
+      - name: Upload xcframework
+        uses: actions/upload-artifact@v3
+        with:
+          name: SwiftHDL-${{ steps.get-arch.outputs.xcframework-arch }}.xcframework
+          path: build/xcodebuild/SwiftHDL.xcframework
 
       - name: Test xcframework
         run: |

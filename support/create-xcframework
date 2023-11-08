@@ -26,7 +26,7 @@ case "$(arch)" in
 "arm64")
   EXCLUDED_ARCHS="x86_64"
   ;;
-"x86_64")
+"i386")
   EXCLUDED_ARCHS="arm64"
   ;;
 *)
