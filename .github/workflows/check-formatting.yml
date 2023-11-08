@@ -16,8 +16,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Format Swift code
         run: |
+          swift build --package-path SwiftHDL --product swift-format 
+          SWIFT_FORMAT="$(swift build --package-path SwiftHDL --product swift-format --show-bin-path)/swift-format"
           for PACKAGE_PATH in "SwiftHDL" "test-projects/TestXCFramework"; do
-            swift run --package-path "$PACKAGE_PATH" swift-format format --in-place --parallel --recursive "$PACKAGE_PATH"/{Sources,Tests,Package.swift}
+            "$SWIFT_FORMAT" format --in-place --parallel --recursive "$PACKAGE_PATH"/{Sources,Tests,Package.swift}
           done
       - name: Check that no diff was created
         run: |
