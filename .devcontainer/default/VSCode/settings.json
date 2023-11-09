@@ -45,6 +45,10 @@
   "lldb.launch.expressions": "native",
   "swift.searchSubfoldersForPackages": true,
   "swift.sourcekit-lsp.supported-languages": [ "swift" ],
+  "swift.buildArguments": [
+    "-Xswiftc",
+    "-cxx-interoperability-mode=default"
+  ],
 
   // -- Clangd Settings
   "clangd.checkUpdates": false,

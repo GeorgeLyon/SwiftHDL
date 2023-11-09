@@ -1,5 +1,5 @@
-add_swift_hdl_executable(swift-hdl-placeholder-test
+add_swift_hdl_executable(swift-hdl-test
   PlaceholderTest.cpp)
-target_link_libraries(swift-hdl-placeholder-test
+target_link_libraries(swift-hdl-test
   PRIVATE
-  SwiftHDLPlaceholder)
+  SwiftHDL)

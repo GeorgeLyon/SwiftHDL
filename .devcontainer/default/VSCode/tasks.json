@@ -7,7 +7,7 @@
       "command": "build",
       "targets": [
         "firtool",
-        "SwiftHDLPlaceholder",
+        "SwiftHDL",
         "SwiftHDL_Swift_Test",
         "swift-hdl-lsp-server"
       ],

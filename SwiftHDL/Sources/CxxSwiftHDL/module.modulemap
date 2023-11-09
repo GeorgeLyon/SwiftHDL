@@ -1,0 +1,5 @@
+module CxxSwiftHDL [system] {
+  requires cplusplus17
+  header "SwiftHDL.h"
+  export *
+}

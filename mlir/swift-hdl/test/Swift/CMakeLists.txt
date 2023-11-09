@@ -4,10 +4,8 @@ enable_language(Swift)
 add_executable(SwiftHDL_Swift_Test
   Test.swift
 )
-target_link_libraries(SwiftHDL_Swift_Test SwiftHDLPlaceholder)
+target_link_libraries(SwiftHDL_Swift_Test SwiftHDL)
 target_compile_options(SwiftHDL_Swift_Test
   PRIVATE
-    # -emit-module
-    "SHELL:-cxx-interoperability-mode=swift-5.9"
-    "SHELL:-Xfrontend -validate-tbd-against-ir=none"
+    -cxx-interoperability-mode=default
     -Xcc -std=c++17)

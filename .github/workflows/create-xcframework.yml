@@ -1,0 +1,101 @@
+name: Create and Test XCFramework
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Create and Test XCFramework
+    runs-on: macos-13
+  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+ 
+      - name: Install and setup required tools
+        run: |
+          brew install ccache ninja
+          sudo xcode-select --switch /Applications/Xcode_15.0.1.app/Contents/Developer
+          echo "CCACHE_DIR=$PWD/ccache" >> $GITHUB_ENV
+          swift --version
+          ninja --version
+          ccache --version
+
+      - name: Get cache key parts
+        id: cache-key-parts
+        run: |
+          echo "llvm-hash=${{ hashFiles('mlir/llvm') }}" >> $GITHUB_OUTPUT
+          echo "circt-hash=${{ hashFiles('mlir/circt') }}" >> $GITHUB_OUTPUT
+          echo "repo-hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "cache-key-prefix=\"xcframework-ccache-debug-" >> $GITHUB_OUTPUT
+
+      - name: Restore ccache database
+        uses: actions/cache/restore@v3
+        with: 
+          path: ccache
+          key: ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}-repo_${{ steps.cache-key-parts.outputs.repo-hash }}
+          restore-keys: |
+            ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}-repo_
+            ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_
+            ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_
+      
+      - name: Initialize ccache
+        # We configure ccache to not evict anything during compilation, and we perform a cleanup after compilation completes
+        run: |
+          date +%s > .workflow-start-seconds
+          ccache -M 1600GB
+          ccache -sv
+          ccache -z
+
+      - name: Install SwiftHDL
+        run: |
+          ./support/install-target-and-dependencies SwiftHDL
+
+      - name: Create xcframework
+        run: |
+          ./support/create-xcframework
+
+      - name: Get Architecture
+        id: get-arch
+        run: |
+          echo "xcframework-arch=$(arch)" >> $GITHUB_OUTPUT
+
+      - name: Upload xcframework
+        uses: actions/upload-artifact@v3
+        with:
+          name: SwiftHDL-${{ steps.get-arch.outputs.xcframework-arch }}.xcframework
+          path: build/xcodebuild/SwiftHDL.xcframework
+
+      - name: Test xcframework
+        run: |
+          swift test --package-path test-projects/TestXCFramework
+
+      - name: Clean up ccache and log stats
+        run: |
+          ccache -sv
+          ccache -M 1GB
+          ccache --cleanup
+          ccache -sv
+
+      # Save the cache prior to pruning it. We save the cache unconditionally since installing SwiftHDL may have made meaningful progress even if it eventually failed.
+      - name: Save ccache database
+        uses: actions/cache/save@v3
+        if: always()
+        with: 
+          path: ccache
+          key: ${{ steps.cache-key-parts.outputs.cache-key-prefix }}-llvm_${{ steps.cache-key-parts.outputs.llvm-hash }}-circt_${{ steps.cache-key-parts.outputs.circt-hash }}-repo_${{ steps.cache-key-parts.outputs.repo-hash }}
+
+      # If evicting everything that wasn't used this workflow does not reduce the cache past its maximum, it may benefit performance to increase the cache size.
+      - name: Log ccache estimated usage
+        run: |
+          ccache --evict-older-than $(($(date +%s) - $(cat .workflow-start-seconds)))s
+          ccache -sv
+          rm .workflow-start-seconds
+      
+      - name: Check that repository is clean
+        run: |
+          git diff --exit-code

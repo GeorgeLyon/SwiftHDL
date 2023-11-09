@@ -36,9 +36,9 @@ EOF
 #
 # Export GraphViz
 GRAPHVIZ_BASE="$CMAKE_HELPER_BUILD_ROOT/graphviz/dot"
-"$PROJECT_ROOT/.devcontainer/cmake-tools-helper" print-configure-args |
+"$SCRIPT_DIR/cmake-helper" print-configure-args |
   xargs cmake \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-Debug}" \
     -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" \
     -B"$CMAKE_HELPER_BUILD_DIR" \
     --graphviz="$GRAPHVIZ_BASE"
@@ -61,4 +61,4 @@ EOF
 # Install internal libraries and headers
 sed -n 's/^internal: \(.*\)/install-\1/p' < "$TRANSITIVE_DEPENDENCIES_FILE" | xargs cmake \
   --build "$CMAKE_HELPER_BUILD_DIR" \
-  --target install-{llvm,mlir,circt}-headers
+  --target install-{llvm,mlir,circt,swift-hdl}-headers
