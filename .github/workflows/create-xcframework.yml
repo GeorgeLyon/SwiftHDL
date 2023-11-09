@@ -20,6 +20,7 @@ jobs:
         run: |
           brew install ccache ninja
           sudo xcode-select --switch /Applications/Xcode_15.0.1.app/Contents/Developer
+          echo "CCACHE_DIR=$PWD/ccache" >> $GITHUB_ENV
           swift --version
           ninja --version
           ccache --version
