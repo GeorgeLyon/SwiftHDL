@@ -1,0 +1,29 @@
+name: Create x86_64 libs
+
+on:
+  workflow_dispatch:
+    inputs:
+      binaryTargetURL: 
+        type: string
+        required: true
+        description: URL to the zipped XCFramework
+      binaryTargetChecksum:
+        type: string
+        required: true
+        description: checksum to use with the binart target
+
+jobs:
+  build-and-test:
+    name: Create and Test XCFramework
+    runs-on: macos-13
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Tweak test project
+        run: |
+          sed -i'.bak' 's@path.*.xcframework"),@url: "${{ github.event.inputs. binaryTargetURL }}", checksum: "${{ github.event.inputs.binaryTargetChecksum }}"),@' test-projects/TestXCFramework/Package.swif
+      - name: Test tweaked test project
+        run: |
+          swift test --package-path test-projects/TestXCFramework
+        

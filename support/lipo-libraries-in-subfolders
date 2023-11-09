@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# This script does not have good guardrails... use with caution.
+
+ARM64_LIBRARIES=$(find "arm64" -depth 1)
+
+for LIBRARY in $ARM64_LIBRARIES; do
+  LIBRARY_NAME=$(basename "$LIBRARY")
+  lipo -create $(find . -name "$LIBRARY_NAME") -output "$LIBRARY_NAME"
+done
+
