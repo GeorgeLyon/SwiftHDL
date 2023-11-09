@@ -23,6 +23,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Switch to Swift 5.9
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_15.0.1.app/Contents/Developer
+          swift --version
       - name: Tweak test project
         run: |
           sed -i'.bak' 's@path.*.xcframework"),@url: "${{ github.event.inputs. binaryTargetURL }}", checksum: "${{ github.event.inputs.binaryTargetChecksum }}"),@' test-projects/TestXCFramework/Package.swift
