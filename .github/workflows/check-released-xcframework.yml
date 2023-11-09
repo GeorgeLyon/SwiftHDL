@@ -1,4 +1,4 @@
-name: Create x86_64 libs
+name: Check released XCFramework
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-and-test:
-    name: Create and Test XCFramework
+    name: Check released XCFramework
     runs-on: macos-13
 
     steps:
