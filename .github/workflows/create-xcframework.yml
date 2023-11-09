@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-test:
-    name: Create XCFramework
+    name: Create and Test XCFramework
     runs-on: macos-13
   
     steps:
