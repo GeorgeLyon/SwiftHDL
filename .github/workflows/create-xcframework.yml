@@ -10,7 +10,7 @@ on:
 jobs:
   build-and-test:
     name: Create and Test XCFramework
-    runs-on: macos-13-large
+    runs-on: macos-13
   
     steps:
       - name: Checkout
