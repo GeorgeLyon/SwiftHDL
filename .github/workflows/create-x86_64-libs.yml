@@ -1,0 +1,39 @@
+name: Create x86_64 libs
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/create-x86_64-libs.yml
+
+jobs:
+  build-and-test:
+    name: Create x86_64 libs
+    runs-on: macos-13
+  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+ 
+      - name: Install and setup required tools
+        run: |
+          brew install ccache ninja
+          sudo xcode-select --switch /Applications/Xcode_15.0.1.app/Contents/Developer
+          swift --version
+          ninja --version
+          ccache --version
+
+      - name: Install SwiftHDL
+        run: |
+          ./support/install-target-and-dependencies SwiftHDL
+
+      - name: Get Architecture
+        id: get-arch
+        run: |
+          echo "machine-arch=$(arch)" >> $GITHUB_OUTPUT
+
+      - name: Upload install directory
+        uses: actions/upload-artifact@v3
+        with:
+          name: installed-SwiftHDL-${{ steps.get-arch.outputs.machine-arch }}.xcframework
+          path: build/install
