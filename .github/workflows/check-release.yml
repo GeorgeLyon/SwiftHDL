@@ -1,0 +1,27 @@
+name: Check Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseTag: 
+        type: string
+        required: true
+        description: The release tag to check
+
+jobs:
+  build-and-test:
+    name: Check Release '${{ github.event.inputs.releaseTag }}'
+    runs-on: macos-13
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Switch to Swift 5.9
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_15.0.1.app/Contents/Developer
+          swift --version
+      - name: Test SwiftHDL Release ${{ github.event.inputs.releaseTag }}
+        env: 
+          SWIFTHDL_RELEASE: ${{ github.event.inputs.releaseTag }}
+        run: |
+          swift test --package-path test-projects/TestRelease
+        

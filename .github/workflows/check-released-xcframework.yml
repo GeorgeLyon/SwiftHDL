@@ -1,0 +1,33 @@
+name: Check Released XCFramework
+
+on:
+  workflow_dispatch:
+    inputs:
+      binaryTargetURL: 
+        type: string
+        required: true
+        description: URL to the zipped XCFramework
+      binaryTargetChecksum:
+        type: string
+        required: true
+        description: checksum to use with the binary target
+
+jobs:
+  build-and-test:
+    name: Check Released XCFramework
+    runs-on: macos-13
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Switch to Swift 5.9
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_15.0.1.app/Contents/Developer
+          swift --version
+      - name: Test SwiftHDL Binary Target
+        env:
+          SWIFTHDL_BINARY_TARGET_URL: ${{ github.event.inputs.binaryTargetURL }}
+          SWIFTHDL_BINARY_TARGET_CHECKSUM: ${{ github.event.inputs.binaryTargetChecksum }}
+        run: |
+          swift test --package-path test-projects/TestXCFramework
+        

@@ -1,11 +1,3 @@
-/build
-/.vscode
-
-# ccache
-/ccache
-/.ccache
-
-# Swift Package Manager
 .DS_Store
 /.build
 /Packages
