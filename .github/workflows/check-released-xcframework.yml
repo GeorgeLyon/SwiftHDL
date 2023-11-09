@@ -11,6 +11,9 @@ on:
         type: string
         required: true
         description: checksum to use with the binart target
+  pull_request:
+    paths:
+      - .github/workflows/check-released-xcframework.yml
 
 jobs:
   build-and-test:
