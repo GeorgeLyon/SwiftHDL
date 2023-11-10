@@ -24,16 +24,15 @@ jobs:
           ccache --version
 
       - name: Install SwiftHDL
+        id: install-swift-hdl
+        env:
+          CMAKE_BUILD_TYPE: RelWithDebInfo
         run: |
           ./support/install-target-and-dependencies SwiftHDL
-
-      - name: Get Architecture
-        id: get-arch
-        run: |
-          echo "machine-arch=$(arch)" >> $GITHUB_OUTPUT
+          echo "arch=$(arch)" >> $GITHUB_OUTPUT
 
       - name: Upload install directory
         uses: actions/upload-artifact@v3
         with:
-          name: installed-SwiftHDL-${{ steps.get-arch.outputs.machine-arch }}.xcframework
+          name: SwiftHDL-install-${{ steps.install-swift-hdl.outputs.arch }}.xcframework
           path: build/install

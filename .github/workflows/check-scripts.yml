@@ -5,8 +5,9 @@ on:
   pull_request:
   push:
     paths:
-      - ./.devcontainer/**
-      - ./mlir/support
+      - ./.devcontainer/cmake-tools-helper
+      - ./.devcontainer/devcontainer-helper
+      - ./support
     branches:
       - main
 
@@ -52,5 +53,8 @@ jobs:
         push: never
         runCmd: |
           shellcheck --version
-          shellcheck .devcontainer/{cmake-tools,devcontainer}-helper
-          shellcheck support/{{circt,cmake}-helper,install-target-and-dependencies}
+          shellcheck \
+            .devcontainer/{cmake-tools,devcontainer}-helper \
+            support/{circt,cmake}-helper \
+            support/install-target-and-dependencies \
+            support/create-xcframework
