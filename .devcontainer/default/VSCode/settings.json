@@ -43,12 +43,13 @@
   // -- Swift
   "lldb.library": "/swift/usr/lib/liblldb.so",
   "lldb.launch.expressions": "native",
-  "swift.searchSubfoldersForPackages": true,
+  "swift.searchSubfoldersForPackages": false,
   "swift.sourcekit-lsp.supported-languages": [ "swift" ],
   "swift.buildArguments": [
     "-Xswiftc",
     "-cxx-interoperability-mode=default"
   ],
+  "apple-swift-format.onlyEnableOnSwiftPMProjects": true,
 
   // -- Clangd Settings
   "clangd.checkUpdates": false,
