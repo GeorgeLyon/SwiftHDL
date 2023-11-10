@@ -56,5 +56,5 @@ jobs:
           shellcheck \
             .devcontainer/{cmake-tools,devcontainer}-helper \
             support/{circt,cmake}-helper \
-            support/install-target-and-dependencies} \
+            support/install-target-and-dependencies \
             support/create-xcframework

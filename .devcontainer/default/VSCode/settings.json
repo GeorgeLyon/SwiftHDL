@@ -56,14 +56,18 @@
   "clangd.onConfigChanged": "restart",
   "clangd.arguments": [
     "--all-scopes-completion",
-    "--compile-commands-dir=${workspaceFolder}/build/${workspaceFolderBasename}",
+    // For some reason, ${workpsaceFolderBasename} fails to resolve here so we specify "SwiftHDL" explicitly
+    "--compile-commands-dir=${workspaceFolder}/build/SwiftHDL",
     "--header-insertion=never",
     "--clang-tidy",
     "--pch-storage=memory"
   ],
 
-  // -- MLIR LSP Server
+  // -- MLIR
   "mlir.onSettingsChanged": "restart",
+  "mlir.tablegen_compilation_databases": [
+    "${workspaceFolder}/build/${workspaceFolderBasename}/tablegen_compile_commands.yml"
+  ],
 
   // -- Other
   "search.exclude": {
