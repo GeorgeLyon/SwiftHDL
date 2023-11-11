@@ -48,7 +48,7 @@ case "$1" in
       exit 1
     fi
     
-    jq -r "[.tasks[] | select(.group | .kind == \"$TASK_KIND\" and .isDefault)][0] | .targets | join(\"\n\")" < "$VSCODE_TASKS_JSON"
+    jq -r "[.tasks[] | select(.type == \"cmake\") | select(.group | .kind == \"$TASK_KIND\")][0] | .targets | join(\"\n\")" < "$VSCODE_TASKS_JSON"
     ;;
   *)
     echo "Usage: $0 [print-configure-args,print-build-targets,print-test-targets]"

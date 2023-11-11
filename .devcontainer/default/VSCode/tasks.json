@@ -11,7 +11,10 @@
         "SwiftHDL_Swift_Test",
         "swift-hdl-lsp-server"
       ],
-      "group": "build",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
       "problemMatcher": [ ]
     },
     {
