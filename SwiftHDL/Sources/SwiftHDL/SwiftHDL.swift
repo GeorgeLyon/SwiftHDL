@@ -1,13 +1,14 @@
+@_implementationOnly import CxxStdlib
 @_implementationOnly import CxxSwiftHDL
 
 public enum SwiftHDL {
   public static func test() -> String {
-    let context = mlir.MLIRContextCreate()
-    let string: StaticString = "Hello, CIRCT!"
-    let attribute = string.withUTF8Buffer { buffer in
-      let stringRef = llvm.StringRef(buffer.baseAddress, buffer.count)
-      return mlir.StringAttr.get(context, llvm.Twine(stringRef))
+    let threadPool = ThreadPool()
+    let context = MLIRContext(threadPool)
+    let attribute = context.withCxx { context in
+      return mlir.StringAttr.get(context, "Hello, CIRCT!")
     }
+    
     return String(attribute.str())
   }
 }

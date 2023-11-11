@@ -11,10 +11,7 @@
         "SwiftHDL_Swift_Test",
         "swift-hdl-lsp-server"
       ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
+      "group": "build",
       "problemMatcher": [ ]
     },
     {
@@ -29,6 +26,26 @@
         "isDefault": true
       },
       "problemMatcher": [ ]
+    },
+    {
+      "type": "swift",
+      "args": [
+        "build",
+        "--build-tests",
+        "-Xswiftc",
+        "-cxx-interoperability-mode=default"
+      ],
+      "cwd": "/workspaces/SwiftHDL/SwiftHDL",
+      "disableTaskQueue": true,
+      "problemMatcher": [
+        "$swiftc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "label": "swift: Build All (SwiftHDL)",
+      "detail": "swift build --build-tests -Xswiftc -cxx-interoperability-mode=default"
     }
   ]
 }

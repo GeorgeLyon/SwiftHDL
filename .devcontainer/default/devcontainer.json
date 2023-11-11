@@ -16,6 +16,10 @@
     "source=shared-llvm-ccache-database,target=/root/.cache/ccache,type=volume",
     "source=shared-llvm-ccache-config,target=/root/.config/ccache,type=volume"
   ],
+  "containerEnv": {
+    "EDITOR": "code --wait",
+    "GIT_EDITOR": "code --wait"
+  },
   "remoteEnv": {
     "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
     "PATH": "${containerWorkspaceFolder}/build/${containerWorkspaceFolderBasename}/bin:${containerEnv:PATH}",

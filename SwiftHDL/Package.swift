@@ -13,9 +13,6 @@ let package = Package(
       type: .dynamic,
       targets: ["SwiftHDL"])
   ],
-  dependencies: [
-    .package(url: "https://github.com/apple/swift-format", branch: "release/5.9")
-  ],
   targets: [
     .systemLibrary(
       name: "CxxSwiftHDL",

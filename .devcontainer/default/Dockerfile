@@ -9,15 +9,6 @@ ARG CONTAINER_MODE=dev
 # The version of clang to use
 ARG CLANG_VERSION=17
 
-# Setup container environment
-ENV \
-    # Change locale to suppress some warnings
-    LC_ALL=C \
-    #
-    # Set VSCode as default editor
-    EDITOR="code --wait" \
-    GIT_EDITOR="code --wait"
-
 # Setup container
 RUN \
     #
@@ -115,8 +106,13 @@ RUN \
     ln -s /swift/usr/bin/swiftc /usr/bin/swiftc && \
     ln -s /swift/usr/bin/sourcekit-lsp /usr/bin/sourcekit-lsp && \
     #
-    # Verilator hardcodes "g++" as the C++ compiler, so we symlink clang++ to g++ to avoid having gcc installed
-    cd /usr/bin && ln -s clang++-$CLANG_VERSION g++ && \
+    # Install swift-format
+    mkdir /swift-format && \
+    curl -sL "https://github.com/apple/swift-format/archive/refs/heads/release/5.9.tar.gz" | tar xz --strip-components=1 -C /swift-format && \
+    # We use the "debug" configuration because the release build is really slow
+    swift build --package-path /swift-format -c debug && \
+    mv "$(swift build --package-path /swift-format --show-bin-path)"/swift-format /usr/bin/swift-format && \
+    rm -rf /swift-format && \
     #
     # Based on the container mode, either remove unnecessary packages or install additional developer-oriented packages
     case "$CONTAINER_MODE" in \
