@@ -3,7 +3,9 @@
 
 extension llvm.StringRef: ExpressibleByStringLiteral {
   public init(stringLiteral value: StaticString) {
-    self.init(value.utf8Start, value.utf8CodeUnitCount)
+    self = value.withUTF8Buffer { buffer in
+      Self(buffer.baseAddress, buffer.count)
+    }
   }
 }
 
