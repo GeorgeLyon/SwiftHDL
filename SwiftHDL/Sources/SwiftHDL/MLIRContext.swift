@@ -5,7 +5,7 @@ class MLIRContext {
   init(_ threadPool: ThreadPool) {
     self.threadPool = threadPool
     cxx = threadPool.withCxx(CxxSwiftHDL.createMLIRContext)!
-    CxxSwiftHDL.loadSwiftHDLDialects(cxx);
+    CxxSwiftHDL.loadSwiftHDLDialects(cxx)
   }
   deinit {
     CxxSwiftHDL.destroyMLIRContext(cxx)

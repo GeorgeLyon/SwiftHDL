@@ -8,7 +8,7 @@ public enum SwiftHDL {
     let attribute = context.withCxx { context in
       return mlir.StringAttr.get(context, "Hello, CIRCT!")
     }
-    
+
     return String(attribute.str())
   }
 }
