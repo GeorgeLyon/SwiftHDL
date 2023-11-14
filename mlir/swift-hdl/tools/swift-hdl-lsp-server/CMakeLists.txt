@@ -1,4 +1,4 @@
-add_llvm_tool(swift-hdl-lsp-server
+add_swift_hdl_tool(swift-hdl-lsp-server
   swift-hdl-lsp-server.cpp)
 target_link_libraries(swift-hdl-lsp-server PRIVATE 
   CIRCTFIRRTL

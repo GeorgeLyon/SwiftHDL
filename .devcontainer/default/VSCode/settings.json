@@ -55,6 +55,7 @@
     "-Xswiftc",
     "-cxx-interoperability-mode=default"
   ],
+  "swift.disableAutoResolve": true,
 
   // -- Clangd Settings
   "clangd.checkUpdates": false,
