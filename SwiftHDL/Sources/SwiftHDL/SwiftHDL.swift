@@ -1,9 +1,9 @@
 @_implementationOnly import CxxStdlib
 @_implementationOnly import CxxSwiftHDL
 
-extension circt.firrtl.CircuitOp: Op {
+// extension circt.firrtl.CircuitOp: Op {
 
-}
+// }
 
 public enum SwiftHDL {
   private static let threadPool = ManagedThreadPool()
@@ -21,7 +21,7 @@ public enum SwiftHDL {
     context.loadSwiftHDLDialects()
     let builder = await ManagedBuilder(context)
 
-    foo(circt.firrtl.CircuitOp.self)
+    // foo(circt.firrtl.CircuitOp.self)
 
   }
 }
