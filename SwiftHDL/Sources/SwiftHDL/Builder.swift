@@ -13,10 +13,10 @@ public class ManagedBuilder: Identifiable {
   public var isValid: Bool = true
   public var cxx: mlir.OpBuilder
 
-  public func build<Op, eachArg>(
+  public func build<Op, each Arg>(
     _ fn: (mlir.OpBuilder, mlir.OpState) -> Op,
     _ location: mlir.Location,
-    _ args: repeateachArg
+    _ args: repeat each Arg
   ) -> Op {
     fatalError()
   }
