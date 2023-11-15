@@ -36,7 +36,11 @@
       ],
       "settings": {
         // This must be set in devcontainer.json because they must be absolute paths and thus cannot use `${workspaceFolder}` if defined in `settings.json`
-        "mlir.server_path": "${containerWorkspaceFolder}/build/${containerWorkspaceFolderBasename}/bin/swift-hdl-lsp-server"
+        "mlir.server_path": "${containerWorkspaceFolder}/build/${containerWorkspaceFolderBasename}/bin/swift-hdl-lsp-server",
+
+        // -- Swift Settings
+        "lldb.library": "/swift/usr/lib/liblldb.so",
+        "lldb.launch.expressions": "native"
       }
     }
   }

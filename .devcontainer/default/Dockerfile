@@ -108,7 +108,7 @@ RUN \
     #
     # Install swift-format
     mkdir /swift-format && \
-    curl -sL "https://github.com/apple/swift-format/archive/refs/heads/main.zip" | tar xz --strip-components=1 -C /swift-format && \
+    curl -sL "https://github.com/apple/swift-format/archive/refs/heads/main.tar.gz" | tar xz --strip-components=1 -C /swift-format && \
     # We use the "debug" configuration because the release build is really slow
     swift build --package-path /swift-format -c debug && \
     mv "$(swift build --package-path /swift-format --show-bin-path)"/swift-format /usr/bin/swift-format && \
