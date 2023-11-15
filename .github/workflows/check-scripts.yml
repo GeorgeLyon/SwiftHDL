@@ -54,7 +54,7 @@ jobs:
         runCmd: |
           shellcheck --version
           shellcheck \
-            .devcontainer/{cmake-tools,devcontainer}-helper \
-            support/{circt,cmake}-helper \
+            .devcontainer/devcontainer-helper \
+            support/{circt,cmake{,-tools}}-helper \
             support/install-target-and-dependencies \
             support/create-xcframework
