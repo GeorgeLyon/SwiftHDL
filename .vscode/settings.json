@@ -47,8 +47,6 @@
   ],
 
   // -- Swift
-  "lldb.library": "/swift/usr/lib/liblldb.so",
-  "lldb.launch.expressions": "native",
   "swift.searchSubfoldersForPackages": false,
   "swift.sourcekit-lsp.supported-languages": [ "swift" ],
   "swift.buildArguments": [
@@ -71,9 +69,7 @@
 
   // -- MLIR
   "mlir.onSettingsChanged": "restart",
-  "mlir.tablegen_compilation_databases": [
-    "${workspaceFolder}/build/${workspaceFolderBasename}/tablegen_compile_commands.yml"
-  ],
+  "mlir.server_path": "${workspaceFolder}/build/${workspaceFolderBasename}/bin/swift-hdl-lsp-server",
 
   // -- Other
   "search.exclude": {

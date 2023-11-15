@@ -5,7 +5,7 @@
 
 /// A class which manages the lifespan of MLIRContext. This class is not threadsafe.
 public class ManagedMLIRContext: Identifiable {
-  public init(_ threadPool: ThreadPool) async {
+  public init(_ threadPool: ManagedThreadPool) async {
     self.threadPool = threadPool
     cxx = threadPool.withCxx { cxxThreadPool in
       CxxSwiftHDL.createMLIRContext(cxxThreadPool)
@@ -24,7 +24,7 @@ public class ManagedMLIRContext: Identifiable {
     return try body(cxx)
   }
 
-  private let threadPool: ThreadPool
+  private let threadPool: ManagedThreadPool
   private let cxx: OpaquePointer
 }
 

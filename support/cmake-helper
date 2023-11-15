@@ -18,7 +18,7 @@ fi
 
 case "$1" in
   "print-configure-args")
-    "$PROJECT_ROOT/.devcontainer/cmake-tools-helper" print-configure-args
+    "$PROJECT_ROOT/support/cmake-tools-helper" print-configure-args
     if [[ "$OSTYPE" == "darwin"* ]]; then
       echo "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0"
     fi

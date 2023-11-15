@@ -1,7 +1,7 @@
 @_implementationOnly import CxxStdlib
 @_implementationOnly import CxxSwiftHDL
 
-public class ThreadPool {
+public class ManagedThreadPool {
   public init() {
     cxx = CxxSwiftHDL.createThreadPool()
   }

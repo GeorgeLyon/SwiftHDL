@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
   name: "SwiftHDL",
   platforms: [
-    .macOS(.v10_13)
+    .macOS("13.3.0")
   ],
   products: [
     .library(

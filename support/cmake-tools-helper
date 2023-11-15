@@ -6,8 +6,7 @@ set -euo pipefail
 
 PROJECT_ROOT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
 
-# By default, we use the settings specified for the `default` devcontainer
-VSCODE_SETTINGS_ROOT=${VSCODE_SETTINGS_ROOT:-$PROJECT_ROOT/.devcontainer/default/VSCode}
+VSCODE_SETTINGS_ROOT=${VSCODE_SETTINGS_ROOT:-$PROJECT_ROOT/.vscode}
 
 case "$1" in
   "print-configure-args")
