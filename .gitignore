@@ -1,5 +1,5 @@
 /build
-/.vscode
+/compile_commands.json
 
 # ccache
 /ccache

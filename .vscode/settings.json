@@ -23,6 +23,12 @@
     "-DLLVM_ENABLE_BINDINGS=OFF",
     "-DLLVM_ENABLE_MODULES=OFF",
     "-DLLVM_USE_SANITIZER=",
+    "-DLLVM_EXTERNALIZE_DEBUGINFO=ON",
+
+    // LLVM (Relative Paths)
+    "-DLLVM_USE_RELATIVE_PATHS_IN_FILES=ON",
+    "-DLLVM_USE_RELATIVE_PATHS_IN_DEBUG_INFO=ON",
+    "-DLLVM_SOURCE_PREFIX=${workspaceFolder}/mlir",
 
     // LLVM (performance)
     // "-DLLVM_USE_LINKER=lld", Not yet compatible with Swift
@@ -41,15 +47,13 @@
   ],
 
   // -- Swift
-  "lldb.library": "/swift/usr/lib/liblldb.so",
-  "lldb.launch.expressions": "native",
   "swift.searchSubfoldersForPackages": false,
   "swift.sourcekit-lsp.supported-languages": [ "swift" ],
   "swift.buildArguments": [
     "-Xswiftc",
     "-cxx-interoperability-mode=default"
   ],
-  "apple-swift-format.onlyEnableOnSwiftPMProjects": true,
+  "swift.disableAutoResolve": true,
 
   // -- Clangd Settings
   "clangd.checkUpdates": false,
@@ -65,9 +69,7 @@
 
   // -- MLIR
   "mlir.onSettingsChanged": "restart",
-  "mlir.tablegen_compilation_databases": [
-    "${workspaceFolder}/build/${workspaceFolderBasename}/tablegen_compile_commands.yml"
-  ],
+  "mlir.server_path": "${workspaceFolder}/build/${workspaceFolderBasename}/bin/swift-hdl-lsp-server",
 
   // -- Other
   "search.exclude": {

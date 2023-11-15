@@ -5,16 +5,13 @@ import PackageDescription
 let package = Package(
   name: "SwiftHDL",
   platforms: [
-    .macOS(.v10_13)
+    .macOS("13.3.0")
   ],
   products: [
     .library(
       name: "SwiftHDL",
       type: .dynamic,
       targets: ["SwiftHDL"])
-  ],
-  dependencies: [
-    .package(url: "https://github.com/apple/swift-format", branch: "release/5.9")
   ],
   targets: [
     .systemLibrary(

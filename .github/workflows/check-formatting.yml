@@ -16,10 +16,13 @@ jobs:
         uses: actions/checkout@v3
       - name: Format Swift code
         run: |
-          brew install swift-format
+          git clone https://github.com/apple/swift-format
+          swift build --package-path swift-format -c release
+          SWIFT_FORMAT="$(pwd)/.build/release/swift-format"
           for PACKAGE_PATH in "SwiftHDL" "test-projects/TestXCFramework"; do
-            swift-format format --in-place --parallel --recursive "$PACKAGE_PATH"/{Sources,Tests,Package.swift}
+            "$SWIFT_FORMAT" format --in-place --parallel --recursive "$PACKAGE_PATH"/{Sources,Tests,Package.swift}
           done
+          rm -rf swift-format
       - name: Check that no diff was created
         run: |
           git diff

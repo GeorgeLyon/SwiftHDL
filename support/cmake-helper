@@ -18,9 +18,9 @@ fi
 
 case "$1" in
   "print-configure-args")
-    "$PROJECT_ROOT/.devcontainer/cmake-tools-helper" print-configure-args
+    "$SCRIPT_DIR/cmake-tools-helper" print-configure-args
     if [[ "$OSTYPE" == "darwin"* ]]; then
-      echo "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13"
+      echo "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0"
     fi
     ;;
   "configure")
@@ -35,7 +35,7 @@ case "$1" in
     ln -s "$CMAKE_HELPER_BUILD_DIR/compile_commands.json" "$PROJECT_ROOT/build/compile_commands.json"
     ;;
   "build"|"test")
-    ./.devcontainer/cmake-tools-helper "print-$1-targets" |
+    "$SCRIPT_DIR/cmake-tools-helper" "print-$1-targets" |
       xargs cmake \
         --build "$CMAKE_HELPER_BUILD_DIR" \
         --target
