@@ -9,7 +9,7 @@
         "firtool",
         "SwiftHDL",
         "SwiftHDL_Swift_Test",
-        "swift-hdl-lsp-server",
+        "swift-hdl-lsp-server"
       ],
       "group": {
         "kind": "build",
